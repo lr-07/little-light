@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Little Light</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="lang-toggle">
+    <button id="langBtn" onclick="toggleLanguage()">EN</button>
+  </div>
+
+  <div id="app">
+    <section id="splash" class="screen active">
+      <div class="cloud">☁️</div>
+      <div class="cloud">☁️</div>
+      <div class="cloud">☁️</div>
+      <div class="stars">✨</div>
+      <div class="stars">⭐</div>
+      <div class="stars">🌟</div>
+      <div class="moon">🌙</div>
+      <h1>Little Light</h1>
+      <p>A small light for difficult days.</p>
+      <small>No one should face difficult days alone.</small>
+    </section>
+
+    <section id="home" class="screen">
+      <div class="header">
+        <div class="moon">🌙</div>
+        <h2 id="homeTitle">Good Evening.</h2>
+        <p id="homeSubtitle">How are you feeling today?</p>
+      </div>
+      <div class="moods">
+        <button onclick="selectMood(this)">😊</button>
+        <button onclick="selectMood(this)">🙂</button>
+        <button onclick="selectMood(this)">😔</button>
+        <button onclick="selectMood(this)">😭</button>
+      </div>
+      <div class="divider"></div>
+      <div class="chat-entry">
+        <p class="subtitle" id="chatSubtitle">Take your time.<br>I'm here to listen.</p>
+        <button class="btn" onclick="navigateTo('chat')">Talk with Lumi</button>
+      </div>
+      <div class="divider"></div>
+      <div class="card journal-card">
+        <div class="card-header">
+          <div class="card-icon">📝</div>
+          <div>
+            <div class="card-title" id="journalTitle">Today's Journal</div>
+            <div class="card-desc" id="journalDesc">What happened today?</div>
+          </div>
+        </div>
+        <textarea placeholder="Write anything that's on your mind..." oninput="saveJournal(this)"></textarea>
+      </div>
+      <div class="card journey-card" onclick="navigateTo('journey')">
+        <div class="tree">🌱</div>
+        <div class="info">
+          <div class="label" id="journeyLabel">Little Journey</div>
+          <div class="value">Day 6</div>
+          <div class="progress">
+            <div class="progress-bar"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card quote-card">
+        <div class="quote-icon">💫</div>
+        <div class="quote-text">"The sky doesn't ask you to be perfect."</div>
+        <div class="quote-author">— Today's gentle reminder</div>
+      </div>
+    </section>
+
+    <section id="chat" class="screen">
+      <div class="chat-header">
+        <div class="back" onclick="navigateTo('home')">←</div>
+        <div class="avatar">🐱</div>
+        <div class="title">Lumi</div>
+      </div>
+      <div id="messages" class="messages">
+        <div class="message ai">Hi, I'm Lumi. How are you feeling today?</div>
+      </div>
+      <div class="input-area">
+        <input id="msg" placeholder="Tell me anything..." onkeypress="handleKeyPress(event)">
+        <button class="btn" onclick="sendMessage()">Send</button>
+      </div>
+    </section>
+
+    <section id="mood-journal" class="screen">
+      <div class="back-bar">
+        <div class="back" onclick="navigateTo('home')">←</div>
+        <h2 id="moodTitle">Mood Journal</h2>
+      </div>
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3 id="moodStep1">How are you feeling?</h3>
+        <p>Select one that feels right</p>
+      </div>
+      <div class="mood-grid">
+        <button onclick="selectMoodOption(this,'happy')">😊<span>Happy</span></button>
+        <button onclick="selectMoodOption(this,'calm')">🙂<span>Calm</span></button>
+        <button onclick="selectMoodOption(this,'sad')">😔<span>Sad</span></button>
+        <button onclick="selectMoodOption(this,'overwhelmed')">😭<span>Overwhelmed</span></button>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3 id="moodStep2">What's weighing on you?</h3>
+        <p>Choose one or more</p>
+      </div>
+      <div class="source-grid">
+        <button onclick="toggleSource(this,'work')">💼 Work</button>
+        <button onclick="toggleSource(this,'money')">💰 Money</button>
+        <button onclick="toggleSource(this,'family')">👨‍👩‍👧 Family</button>
+        <button onclick="toggleSource(this,'relationship')">💞 Relationship</button>
+        <button onclick="toggleSource(this,'health')">❤️ Health</button>
+        <button onclick="toggleSource(this,'other')">📌 Other</button>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3 id="moodStep3">A little gratitude</h3>
+        <p>Is there one small thing to be thankful for?</p>
+      </div>
+      <div class="gratitude-section">
+        <textarea id="gratitude" placeholder="Today, I'm grateful for..."></textarea>
+        <button class="btn" style="width:100%" onclick="saveMoodJournal()">Save Journal</button>
+      </div>
+    </section>
+
+    <section id="journey" class="screen">
+      <div class="back-bar">
+        <div class="back" onclick="navigateTo('home')">←</div>
+        <h2 id="journeyTitle">Little Journey</h2>
+      </div>
+      <div class="journey-header">
+        <div class="tree-stage">🌱</div>
+        <h3 id="journeySubtitle">30 Days of Restart</h3>
+        <p>Every day, take a small step forward</p>
+      </div>
+      <div class="progress-overall">
+        <div class="label">Progress</div>
+        <div class="bar">
+          <div class="bar-fill"></div>
+        </div>
+        <div class="stats">
+          <span>Day 6 / 30</span>
+          <span>20% Complete</span>
+        </div>
+      </div>
+      <h4 style="font-size:16px;font-weight:600;margin-bottom:12px">Your Journey</h4>
+      <div class="day-cards">
+        <div class="day-card completed">1</div>
+        <div class="day-card completed">2</div>
+        <div class="day-card completed">3</div>
+        <div class="day-card completed">4</div>
+        <div class="day-card completed">5</div>
+        <div class="day-card current">6</div>
+        <div class="day-card locked">7</div>
+        <div class="day-card locked">8</div>
+        <div class="day-card locked">9</div>
+        <div class="day-card locked">10</div>
+        <div class="day-card locked">11</div>
+        <div class="day-card locked">12</div>
+        <div class="day-card locked">13</div>
+        <div class="day-card locked">14</div>
+        <div class="day-card locked">15</div>
+        <div class="day-card locked">16</div>
+        <div class="day-card locked">17</div>
+        <div class="day-card locked">18</div>
+        <div class="day-card locked">19</div>
+        <div class="day-card locked">20</div>
+        <div class="day-card locked">21</div>
+        <div class="day-card locked">22</div>
+        <div class="day-card locked">23</div>
+        <div class="day-card locked">24</div>
+        <div class="day-card locked">25</div>
+        <div class="day-card locked">26</div>
+        <div class="day-card locked">27</div>
+        <div class="day-card locked">28</div>
+        <div class="day-card locked">29</div>
+        <div class="day-card locked">30</div>
+      </div>
+      <div class="card" style="margin-top:24px">
+        <h4 style="font-size:16px;font-weight:600;margin-bottom:8px">Today's Task</h4>
+        <p style="font-size:14px;opacity:0.8;margin-bottom:16px">Take three deep breaths and name one thing that made you smile today.</p>
+        <button class="btn" style="width:100%" onclick="completeTask()">Mark Complete</button>
+      </div>
+    </section>
+
+    <section id="community" class="screen">
+      <div class="back-bar">
+        <div class="back" onclick="navigateTo('home')">←</div>
+        <h2 id="communityTitle">Tree Hole</h2>
+      </div>
+      <div class="community-header">
+        <div class="title">Anonymous Sharing</div>
+        <div class="desc">Share your thoughts. You're not alone.</div>
+      </div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar">🐰</div>
+          <div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">2 hours ago</div>
+          </div>
+        </div>
+        <div class="post-content">I feel so tired lately. Everything feels heavy, and I don't know how to keep going. But I'm trying.</div>
+        <div class="ai-reply">
+          <div class="ai-label">Lumi's Reply</div>
+          <div>I'm so sorry you're carrying this weight. It takes so much courage just to keep trying. Thank you for being here and sharing this with us.</div>
+        </div>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar">🐱</div>
+          <div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">5 hours ago</div>
+          </div>
+        </div>
+        <div class="post-content">Today was a good day. I went for a walk and saw a beautiful sunset. Sometimes the small moments are the ones that matter most.</div>
+        <div class="ai-reply">
+          <div class="ai-label">Lumi's Reply</div>
+          <div>That sounds so lovely. Celebrating the small moments is such a kind thing to do for yourself. Thank you for sharing this light with us.</div>
+        </div>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
+        </div>
+      </div>
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar">🐻</div>
+          <div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">Yesterday</div>
+          </div>
+        </div>
+        <div class="post-content">I got rejected for the job I really wanted. I've been applying for months and nothing is working. I'm starting to doubt myself.</div>
+        <div class="ai-reply">
+          <div class="ai-label">Lumi's Reply</div>
+          <div>Rejection is so hard, especially when you've put so much into it. Your worth isn't defined by one job or one "no." I believe in you, even when you can't.</div>
+        </div>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="profile" class="screen">
+      <div class="back-bar">
+        <div class="back" onclick="navigateTo('home')">←</div>
+        <h2 id="profileTitle">My Profile</h2>
+      </div>
+      <div class="profile-header">
+        <div class="avatar">🐰</div>
+        <h3>Dear Friend</h3>
+        <p>Your gentle companion is here</p>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="value">12</div>
+          <div class="label">Days Together</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">7</div>
+          <div class="label">Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="value">48</div>
+          <div class="label">Journal Entries</div>
+        </div>
+      </div>
+      <div class="card chart-card">
+        <h4>Mood Trends</h4>
+        <div class="chart">
+          <div class="bar" style="height:60%"></div>
+          <div class="bar" style="height:80%"></div>
+          <div class="bar high" style="height:90%"></div>
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar high" style="height:85%"></div>
+          <div class="bar" style="height:75%"></div>
+        </div>
+      </div>
+      <div class="quote-section">
+        <div class="quote-text">"You are doing better than you think."</div>
+        <div class="quote-date">Your daily quote</div>
+      </div>
+    </section>
+  </div>
+
+  <nav>
+    <div class="nav-items">
+      <div class="nav-item active" onclick="navigateTo('home')">
+        <div class="icon">🏠</div>
+        <div>Home</div>
+      </div>
+      <div class="nav-item" onclick="navigateTo('chat')">
+        <div class="icon">💬</div>
+        <div>Chat</div>
+      </div>
+      <div class="nav-item" onclick="navigateTo('mood-journal')">
+        <div class="icon">📝</div>
+        <div>Journal</div>
+      </div>
+      <div class="nav-item" onclick="navigateTo('community')">
+        <div class="icon">🌳</div>
+        <div>Community</div>
+      </div>
+      <div class="nav-item" onclick="navigateTo('profile')">
+        <div class="icon">👤</div>
+        <div>Profile</div>
+      </div>
+    </div>
+  </nav>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+name = "little-light-api"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+DEEPSEEK_API_KEY = "YOUR_API_KEY_HERE"
+
+[env.production]
+name = "little-light-api-production"
