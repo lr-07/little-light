@@ -106,7 +106,10 @@ function sendMessage() {
 
   fetch('https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev/api/chat', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 
+      'Content-Type': 'application/json',
+      'X-API-Key': 'sk-2a0246f90ee2465a84b2954897915b89',
+    },
     body: JSON.stringify({ messages: [{ role: 'user', content: value }] }),
   })
   .then(res => res.json())
