@@ -104,7 +104,7 @@ function sendMessage() {
   messages.appendChild(typing);
   messages.scrollTop = messages.scrollHeight;
 
-  fetch('/api/chat', {
+  fetch('https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages: [{ role: 'user', content: value }] }),
