@@ -7,5 +7,3 @@ DEEPSEEK_API_KEY = "YOUR_API_KEY_HERE"
 
 [env.production]
 name = "little-light-api-production"
-# wrangler.toml
-name = 'little-light'
