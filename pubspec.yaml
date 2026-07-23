@@ -1,0 +1,38 @@
+name: little_light
+description: A small light for difficult days.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.19.0
+  cupertino_icons: ^1.0.5
+  http: ^1.2.2
+  shared_preferences: ^2.2.3
+  firebase_core: ^3.3.0
+  firebase_auth: ^5.1.0
+  cloud_firestore: ^5.1.0
+  google_sign_in: ^6.2.1
+  flutter_facebook_auth: ^7.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_gen_runner: ^5.5.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+  generate: true
+
+flutter_gen:
+  output: lib/generated/
+  integrations:
+    flutter_l10n: true
