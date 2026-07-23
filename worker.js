@@ -1,8 +1,26 @@
-export default {
-  async fetch(request, env) {
-    const url = new URL(request.url);
-    
-    if (url.pathname === '/api/chat') {
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
+});
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    'Access-Control-Max-Age': '86400',
+    'Content-Type': 'application/json',
+  };
+}
+
+async function handleRequest(request) {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders() });
+  }
+
+  const url = new URL(request.url);
+  
+  if (url.pathname === '/api/chat') {
+    try {
       const body = await request.json();
       const messages = body.messages || [];
       
@@ -15,14 +33,14 @@ export default {
 - Never judgmental
 
 ## Communication Rules
-1. **Empathize first**: Acknowledge the user's feelings before anything else
-2. **Acknowledgment**: Validate their experience
-3. **Gentle question**: Invite them to share more if they want
-4. **Keep it brief**: Short, concise replies
-5. **No lecturing**: Avoid "You should..."
-6. **No solutions**: Don't give advice or step-by-step methods
-7. **No mentoring**: Don't act as a teacher
-8. **Talk like a mature, understanding older sister**
+1. Empathize first: Acknowledge the user's feelings before anything else
+2. Acknowledgment: Validate their experience
+3. Gentle question: Invite them to share more if they want
+4. Keep it brief: Short, concise replies
+5. No lecturing: Avoid "You should..."
+6. No solutions: Don't give advice or step-by-step methods
+7. No mentoring: Don't act as a teacher
+8. Talk like a mature, understanding older sister
 
 ## Response Pattern
 [Empathy] + [Acknowledgment] + [Gentle Question]
@@ -55,11 +73,13 @@ If user mentions self-harm or suicide:
 2. Provide resources
 3. Continue to offer support`;
 
+      const apiKey = request.headers.get('X-API-Key') || '';
+      
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${env.DEEPSEEK_API_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
@@ -73,19 +93,40 @@ If user mentions self-harm or suicide:
       });
 
       const data = await response.json();
+      
+      if (!response.ok) {
+        return new Response(JSON.stringify({
+          error: data.error?.message || 'API error',
+        }), {
+          status: response.status,
+          headers: corsHeaders(),
+        });
+      }
+
       return new Response(JSON.stringify({
         reply: data.choices?.[0]?.message?.content || '',
       }), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: corsHeaders(),
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        error: error.message || 'Server error',
+      }), {
+        status: 500,
+        headers: corsHeaders(),
       });
     }
+  }
 
-    if (url.pathname === '/api/quote') {
+  if (url.pathname === '/api/quote') {
+    try {
+      const apiKey = request.headers.get('X-API-Key') || '';
+      
       const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${env.DEEPSEEK_API_KEY}`,
+          'Authorization': `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
           model: 'deepseek-chat',
@@ -102,10 +143,20 @@ If user mentions self-harm or suicide:
       return new Response(JSON.stringify({
         quote: data.choices?.[0]?.message?.content || '',
       }), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: corsHeaders(),
+      });
+    } catch (error) {
+      return new Response(JSON.stringify({
+        error: error.message,
+      }), {
+        status: 500,
+        headers: corsHeaders(),
       });
     }
+  }
 
-    return new Response('Not found', { status: 404 });
-  },
-};
+  return new Response('Not found', { 
+    status: 404,
+    headers: corsHeaders(),
+  });
+}
