@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#A8CFA8">
+  <meta name="description" content="Little Light - A small light for difficult days">
   <title>Little Light</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +13,7 @@
 </head>
 <body>
   <div class="lang-toggle">
-    <button id="langBtn" onclick="toggleLanguage()">FI</button>
+    <button id="langBtn" onclick="toggleLanguage()">EN</button>
   </div>
 
   <div id="app">
@@ -25,8 +26,8 @@
       <div class="stars">🌟</div>
       <div class="moon">🌙</div>
       <h1>Little Light</h1>
-      <p data-i18n="welcomeSlogan">A small light for difficult days.</p>
-      <small data-i18n="welcomeDesc">No one should face difficult days alone.</small>
+      <p>A small light for difficult days.</p>
+      <small>No one should face difficult days alone.</small>
     </section>
 
     <section id="home" class="screen">
@@ -55,7 +56,7 @@
             <div class="card-desc" id="journalDesc">What happened today?</div>
           </div>
         </div>
-        <textarea id="journalTextarea" placeholder="Write anything that's on your mind..." oninput="saveJournal(this)"></textarea>
+        <textarea placeholder="Write anything that's on your mind..." oninput="saveJournal(this)"></textarea>
       </div>
       <div class="card journey-card" onclick="navigateTo('journey')">
         <div class="tree">🌱</div>
@@ -81,7 +82,7 @@
         <div class="title">Lumi</div>
       </div>
       <div id="messages" class="messages">
-        <div class="message ai" id="chatWelcome">Hi, I'm Lumi. How are you feeling today?</div>
+        <div class="message ai">Hi, I'm Lumi. How are you feeling today?</div>
       </div>
       <div class="input-area">
         <input id="msg" placeholder="Tell me anything..." onkeypress="handleKeyPress(event)">
@@ -135,22 +136,22 @@
         <h2 id="journeyTitle">Little Journey</h2>
       </div>
       <div class="journey-header">
-        <div class="tree-stage" id="journeyTree">🌱</div>
+        <div class="tree-stage">🌱</div>
         <h3 id="journeySubtitle">30 Days of Restart</h3>
         <p>Every day, take a small step forward</p>
       </div>
       <div class="progress-overall">
         <div class="label">Progress</div>
         <div class="bar">
-          <div class="bar-fill" id="journeyBarFill"></div>
+          <div class="bar-fill"></div>
         </div>
         <div class="stats">
-          <span>Day <span id="journeyDayNum">6</span> / 30</span>
-          <span><span id="journeyPercent">20</span>% Complete</span>
+          <span>Day 6 / 30</span>
+          <span>20% Complete</span>
         </div>
       </div>
-      <h4 class="section-label">Your Journey</h4>
-      <div class="day-cards" id="dayCards">
+      <h4 style="font-size:16px;font-weight:600;margin-bottom:12px">Your Journey</h4>
+      <div class="day-cards">
         <div class="day-card completed">1</div>
         <div class="day-card completed">2</div>
         <div class="day-card completed">3</div>
@@ -183,8 +184,8 @@
         <div class="day-card locked">30</div>
       </div>
       <div class="card" style="margin-top:24px">
-        <h4 class="section-label">Today's Task</h4>
-        <p class="task-desc">Take three deep breaths and name one thing that made you smile today.</p>
+        <h4 style="font-size:16px;font-weight:600;margin-bottom:8px">Today's Task</h4>
+        <p style="font-size:14px;opacity:0.8;margin-bottom:16px">Take three deep breaths and name one thing that made you smile today.</p>
         <button class="btn" style="width:100%" onclick="completeTask()">Mark Complete</button>
       </div>
     </section>
