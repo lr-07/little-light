@@ -68,7 +68,11 @@ const responses = {
     navChat: 'Chat',
     navJournal: 'Journal',
     navCommunity: 'Community',
-    navProfile: 'Profile'
+    navProfile: 'Profile',
+    gratitudePlaceholder: "Today, I'm thankful for...",
+    moodStep1Desc: 'Pick the one that fits best',
+    moodStep2Desc: 'Select all that apply',
+    moodStep3Desc: 'Even just a warm cup of tea'
   },
   zh: {
     homeTitle: '晚上好 🌙',
@@ -104,7 +108,11 @@ const responses = {
     navChat: '聊天',
     navJournal: '记录',
     navCommunity: '树洞',
-    navProfile: '我的'
+    navProfile: '我的',
+    gratitudePlaceholder: '今天，我感谢...',
+    moodStep1Desc: '选一个最贴近的',
+    moodStep2Desc: '可以多选',
+    moodStep3Desc: '哪怕只是一杯热茶'
   },
   ja: {
     homeTitle: 'こんばんは 🌙',
@@ -140,7 +148,11 @@ const responses = {
     navChat: 'チャット',
     navJournal: '記録',
     navCommunity: 'コミュニティ',
-    navProfile: 'プロフィール'
+    navProfile: 'プロフィール',
+    gratitudePlaceholder: '今日、感謝したいことは...',
+    moodStep1Desc: '一番近いものを選んでください',
+    moodStep2Desc: 'いくつでも選べます',
+    moodStep3Desc: '温かいお茶一杯でもいい'
   },
   ko: {
     homeTitle: '저녁이에요 🌙',
@@ -176,7 +188,11 @@ const responses = {
     navChat: '채팅',
     navJournal: '기록',
     navCommunity: '커뮤니티',
-    navProfile: '프로필'
+    navProfile: '프로필',
+    gratitudePlaceholder: '오늘 고마운 일은...',
+    moodStep1Desc: '가장 가까운 것을 선택하세요',
+    moodStep2Desc: '여러 개 선택 가능',
+    moodStep3Desc: '따뜻한 차 한 잔이라도 좋아요'
   },
   es: {
     homeTitle: 'Buenas noches 🌙',
@@ -212,7 +228,11 @@ const responses = {
     navChat: 'Chat',
     navJournal: 'Diario',
     navCommunity: 'Comunidad',
-    navProfile: 'Perfil'
+    navProfile: 'Perfil',
+    gratitudePlaceholder: 'Hoy, estoy agradecido por...',
+    moodStep1Desc: 'Elige el que mejor se ajuste',
+    moodStep2Desc: 'Selecciona todos los que apliquen',
+    moodStep3Desc: 'Incluso una taza de té caliente'
   },
   fr: {
     homeTitle: 'Bonsoir 🌙',
@@ -248,7 +268,11 @@ const responses = {
     navChat: 'Discussion',
     navJournal: 'Journal',
     navCommunity: 'Communauté',
-    navProfile: 'Profil'
+    navProfile: 'Profil',
+    gratitudePlaceholder: "Aujourd'hui, je suis reconnaissant pour...",
+    moodStep1Desc: 'Choisis celui qui te ressemble le plus',
+    moodStep2Desc: 'Sélectionne tout ce qui s\'applique',
+    moodStep3Desc: 'Même une tasse de thé chaude'
   }
 };
 
@@ -1209,6 +1233,23 @@ function applyTranslations() {
       }
     }
   });
+
+  const gratitude = document.getElementById('gratitude');
+  if (gratitude) gratitude.placeholder = t.gratitudePlaceholder;
+
+  const homeMoodBtns = document.querySelectorAll('#home .moods button');
+  homeMoodBtns.forEach((btn, i) => {
+    if (moodLabelTexts[i]) btn.setAttribute('aria-label', moodLabelTexts[i]);
+  });
+
+  const stepDesc1 = document.getElementById('stepDesc1');
+  if (stepDesc1) stepDesc1.textContent = t.moodStep1Desc;
+
+  const stepDesc2 = document.getElementById('stepDesc2');
+  if (stepDesc2) stepDesc2.textContent = t.moodStep2Desc;
+
+  const stepDesc3 = document.getElementById('stepDesc3');
+  if (stepDesc3) stepDesc3.textContent = t.moodStep3Desc;
 }
 
 function renderJourneyProgress() {
