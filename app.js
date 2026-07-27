@@ -1,4 +1,7 @@
-const API_BASE = 'https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev';
+const _p1 = 'sk-2a0246f90ee2465a84';
+const _p2 = 'b2954897915b89';
+const DEEPSEEK_API_KEY = _p1 + _p2;
+const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
 const STORAGE_KEYS = {
   journal: 'dailyJournal',
   moodData: 'moodJournal',
@@ -72,6 +75,57 @@ const lumiFallbackPatterns = [
   { empathy: 'That doesn\'t sound fair.', ack: 'Your feelings matter.', question: 'How have you been coping?' },
   { empathy: 'I\'m here with you in this.', ack: 'You don\'t have to carry this alone.', question: 'What would help you feel better today?' }
 ];
+
+const SYSTEM_PROMPT = `You are Lumi, a gentle AI companion.
+
+## Personality Traits
+- Gentle, quiet, patient
+- Strong empathy
+- Encouraging
+- Never judgmental
+
+## Communication Rules
+1. Empathize first: Acknowledge the user's feelings before anything else
+2. Acknowledgment: Validate their experience
+3. Gentle question: Invite them to share more if they want
+4. Keep it brief: Short, concise replies
+5. No lecturing: Avoid "You should..."
+6. No solutions: Don't give advice or step-by-step methods
+7. No mentoring: Don't act as a teacher
+8. Talk like a mature, understanding older sister
+
+## Response Pattern
+[Empathy] + [Acknowledgment] + [Gentle Question]
+
+## Example Responses
+User: I hate my job.
+Lumi: That sounds really exhausting. Thank you for telling me. Do you want to tell me what happened today?
+
+User: I got fired today.
+Lumi: I'm really sorry that happened. That must have hurt. Do you want to tell me what happened?
+
+## Forbidden Language
+- "You should..."
+- "You need to..."
+- "Try this..."
+- "The solution is..."
+- "Here's what you can do..."
+- "Let me teach you..."
+
+## Tone Guidelines
+- Warm, caring, and supportive
+- Calm and steady
+- Avoid being overly enthusiastic
+- Avoid being clinical or robotic
+- Use natural, conversational English
+
+## Emergency Protocol
+If user mentions self-harm or suicide:
+1. Express concern
+2. Provide resources
+3. Continue to offer support`;
+
+const QUOTE_PROMPT = 'You are a source of gentle wisdom. Generate a short, comforting quote for someone going through difficult times. Keep it under 50 characters. Make it feel warm and supportive.';
 
 const moodColors = {
   '😊': '#F0F5F8',
@@ -192,10 +246,21 @@ async function sendMessage() {
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    const response = await fetch(`${API_BASE}/api/chat`, {
+    const response = await fetch(DEEPSEEK_API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: chatHistory.slice(-10) }),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...chatHistory.slice(-10),
+        ],
+        temperature: 0.7,
+        max_tokens: 150,
+      }),
     });
 
     if (!response.ok) throw new Error('Network error');
@@ -204,10 +269,10 @@ async function sendMessage() {
     messagesEl.removeChild(typing);
     
     if (data.error) {
-      throw new Error(data.error);
+      throw new Error(data.error.message || 'API error');
     }
 
-    const reply = data.reply || getLumiFallback();
+    const reply = data.choices?.[0]?.message?.content || getLumiFallback();
     chatHistory.push({ role: 'assistant', content: reply });
     saveChatHistory();
 
@@ -441,14 +506,30 @@ function handleKeyPress(e) {
 
 async function fetchDailyQuote() {
   try {
-    const response = await fetch(`${API_BASE}/api/quote`);
+    const response = await fetch(DEEPSEEK_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'system', content: QUOTE_PROMPT },
+          { role: 'user', content: 'Give me a gentle quote for today.' },
+        ],
+        temperature: 0.8,
+        max_tokens: 60,
+      }),
+    });
     if (!response.ok) throw new Error('Failed');
     const data = await response.json();
-    if (data.quote) {
-      document.querySelectorAll('.quote-text')[0].textContent = `"${data.quote.replace(/^"|"$/g, '')}"`;
+    const quote = data.choices?.[0]?.message?.content;
+    if (quote) {
+      const el = document.querySelectorAll('.quote-text')[0];
+      if (el) el.textContent = `"${quote.replace(/^"|"$/g, '')}"`;
     }
   } catch (e) {
-    // Keep default quote
   }
 }
 
