@@ -1171,15 +1171,18 @@ async function sendMessage() {
   setLoading(true);
 
   const userMsg = document.createElement('div');
-  userMsg.className = 'message user';
-  userMsg.textContent = value;
+  userMsg.className = 'message user-message';
+  userMsg.innerHTML = `
+    <div class="message-avatar">👤</div>
+    <div class="message-content">${escapeHtml(value)}</div>
+  `;
   messagesEl.appendChild(userMsg);
   chatHistory.push({ role: 'user', content: value });
   messagesEl.scrollTop = messagesEl.scrollHeight;
   input.value = '';
 
   const typing = document.createElement('div');
-  typing.className = 'message ai typing';
+  typing.className = 'message ai-message typing-indicator';
   typing.innerHTML = '<span></span><span></span><span></span>';
   messagesEl.appendChild(typing);
   messagesEl.scrollTop = messagesEl.scrollHeight;
@@ -1216,10 +1219,14 @@ async function sendMessage() {
     saveChatHistory();
 
     const aiMsg = document.createElement('div');
-    aiMsg.className = 'message ai';
-    aiMsg.textContent = reply;
+    aiMsg.className = 'message ai-message';
+    aiMsg.innerHTML = `
+      <div class="message-avatar">🐱</div>
+      <div class="message-content"></div>
+    `;
     messagesEl.appendChild(aiMsg);
-    typeWriter(aiMsg, reply);
+    const contentEl = aiMsg.querySelector('.message-content');
+    typeWriter(contentEl, reply);
     messagesEl.scrollTop = messagesEl.scrollHeight;
 
   } catch (error) {
@@ -1229,10 +1236,14 @@ async function sendMessage() {
     saveChatHistory();
 
     const aiMsg = document.createElement('div');
-    aiMsg.className = 'message ai';
-    aiMsg.textContent = reply;
+    aiMsg.className = 'message ai-message';
+    aiMsg.innerHTML = `
+      <div class="message-avatar">🐱</div>
+      <div class="message-content"></div>
+    `;
     messagesEl.appendChild(aiMsg);
-    typeWriter(aiMsg, reply);
+    const contentEl = aiMsg.querySelector('.message-content');
+    typeWriter(contentEl, reply);
     messagesEl.scrollTop = messagesEl.scrollHeight;
   } finally {
     setLoading(false);
@@ -1472,13 +1483,13 @@ function toggleHug(btn) {
   const t = responses[currentLang];
   btn.classList.toggle('active');
   btn.innerHTML = btn.classList.contains('active') ? t.huggedText : t.hugText;
-  const hugCount = btn.closest('.post-card')?.querySelector('.post-hug-count');
+  const hugCount = btn.closest('.post-card')?.querySelector('.hug-count');
   if (hugCount) {
-    const current = parseInt(hugCount.textContent) || 0;
+    const current = parseInt(hugCount.textContent.match(/\d+/)?.[0]) || 0;
     if (btn.classList.contains('active')) {
-      hugCount.textContent = `❤️ ${current + 1}`;
+      hugCount.textContent = `🤗 ${current + 1}`;
     } else {
-      hugCount.textContent = `❤️ ${Math.max(0, current - 1)}`;
+      hugCount.textContent = `🤗 ${Math.max(0, current - 1)}`;
     }
   }
 }
@@ -1578,18 +1589,21 @@ function applyTranslations() {
   const taskBtn = document.querySelector('#journey .task-card .btn');
   if (taskBtn) taskBtn.textContent = t.markComplete;
 
-  const talkBtn = document.querySelector('#home .chat-entry .btn');
+  const talkBtn = document.querySelector('#home .chat-start .btn-primary');
   if (talkBtn) talkBtn.textContent = t.talkToLumi;
 
-  const continueBtn = document.querySelector('#home .journey-card .btn');
-  if (continueBtn) continueBtn.textContent = t.continueText;
+  const continueBtn = document.querySelector('#home .journey-section');
+  if (continueBtn) {
+    const journeyLabel = continueBtn.querySelector('.journey-label');
+    if (journeyLabel) journeyLabel.textContent = t.journeyLabel;
+  }
 
-  const welcomeMsg = document.querySelector('#chat .message.ai');
+  const welcomeMsg = document.querySelector('#chat .message.ai-message .message-content');
   if (welcomeMsg && !welcomeMsg.textContent.includes('user')) {
     welcomeMsg.textContent = t.chatWelcome;
   }
 
-  document.querySelectorAll('#community .actions button').forEach(btn => {
+  document.querySelectorAll('#community .post-actions button').forEach(btn => {
     if (btn.classList.contains('active')) {
       btn.textContent = t.huggedText;
     } else {
@@ -1603,7 +1617,7 @@ function applyTranslations() {
     if (navTexts[i]) el.textContent = navTexts[i];
   });
 
-  const moodLabels = document.querySelectorAll('#mood-journal .mood-grid button span');
+  const moodLabels = document.querySelectorAll('#mood-journal .mood-option span');
   const moodLabelTexts = moodLabelsMap[currentLang];
   moodLabels.forEach((label, i) => {
     if (moodLabelTexts[i]) label.textContent = moodLabelTexts[i];
@@ -1623,7 +1637,7 @@ function applyTranslations() {
   const gratitude = document.getElementById('gratitude');
   if (gratitude) gratitude.placeholder = t.gratitudePlaceholder;
 
-  const homeMoodBtns = document.querySelectorAll('#home .moods button');
+  const homeMoodBtns = document.querySelectorAll('#home .mood-btn');
   homeMoodBtns.forEach((btn, i) => {
     if (moodLabelTexts[i]) btn.setAttribute('aria-label', moodLabelTexts[i]);
   });
