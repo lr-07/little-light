@@ -10,6 +10,7 @@
   --border: #EBEBEB;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'HarmonyOS Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,10 +19,11 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overscroll-behavior-y: none;
+  transition: background 0.5s ease;
 }
 
 .screen {
@@ -36,7 +38,7 @@ body {
 
 .active {
   display: block;
-  animation: fadeIn 0.4s ease-out;
+  animation: fadeIn 0.5s ease-out;
 }
 
 @keyframes fadeIn {
@@ -58,7 +60,7 @@ a { text-decoration: none; color: inherit; }
   font-weight: 500;
   font-size: 15px;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
   font-family: inherit;
   letter-spacing: 0.02em;
 }
@@ -66,6 +68,12 @@ a { text-decoration: none; color: inherit; }
 .btn:hover { transform: scale(0.98); box-shadow: var(--shadow-hover); }
 .btn:active { transform: scale(0.95); }
 .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.btn-small {
+  padding: 10px 20px;
+  font-size: 14px;
+  border-radius: 20px;
+}
 
 .btn-outline {
   background: transparent;
@@ -80,7 +88,7 @@ a { text-decoration: none; color: inherit; }
   padding: 20px;
   margin-bottom: 16px;
   box-shadow: var(--shadow);
-  transition: box-shadow 0.2s ease;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .card:hover { box-shadow: var(--shadow-hover); }
@@ -105,60 +113,84 @@ a { text-decoration: none; color: inherit; }
   justify-content: center;
   text-align: center;
   background: linear-gradient(180deg, #E8F0EA 0%, #FAF8F4 100%);
+  position: relative;
+  overflow: hidden;
 }
 
-#splash .moon {
-  font-size: 80px;
-  margin-bottom: 24px;
-  animation: float 4s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-#splash .stars {
+.splash-scene {
   position: absolute;
-  font-size: 24px;
-  animation: pulse 3s ease-in-out infinite;
-  user-select: none;
+  inset: 0;
+  z-index: 0;
 }
 
-#splash .stars:nth-child(2) { left: 20%; top: 100px; animation-delay: 1s; }
-#splash .stars:nth-child(3) { left: 70%; top: 120px; animation-delay: 2s; }
-
-@keyframes pulse {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.2); }
+.scene-svg {
+  width: 100%;
+  height: 100%;
 }
+
+.scene-svg .moon-svg {
+  animation: moonGlow 4s ease-in-out infinite;
+}
+
+@keyframes moonGlow {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+
+.scene-svg .cloud {
+  animation: cloudFloat 8s ease-in-out infinite;
+}
+
+.scene-svg .cloud2 { animation-delay: 2s; animation-duration: 10s; }
+.scene-svg .cloud3 { animation-delay: 4s; animation-duration: 12s; }
 
 @keyframes cloudFloat {
   0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(20px); }
+  50% { transform: translateX(15px); }
 }
 
-@keyframes particleFall {
-  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
-  100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
+.scene-svg .star {
+  animation: starTwinkle 3s ease-in-out infinite;
 }
 
-@keyframes treeGrow {
-  0% { transform: scale(0.5); opacity: 0; }
-  50% { transform: scale(1.15); opacity: 1; }
-  100% { transform: scale(1); opacity: 1; }
+.scene-svg .star2 { animation-delay: 0.5s; }
+.scene-svg .star3 { animation-delay: 1s; }
+.scene-svg .star4 { animation-delay: 1.5s; }
+.scene-svg .star5 { animation-delay: 2s; }
+.scene-svg .star6 { animation-delay: 0.8s; }
+.scene-svg .star7 { animation-delay: 1.3s; }
+.scene-svg .star8 { animation-delay: 1.8s; }
+
+@keyframes starTwinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
 }
 
-#splash .cloud {
-  position: absolute;
-  font-size: 32px;
+.splash-content {
+  position: relative;
+  z-index: 1;
+}
+
+.splash-content h1 {
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: 0.02em;
+}
+
+.splash-content p {
+  font-size: 16px;
+  color: var(--text);
+  opacity: 0.7;
+  margin-bottom: 8px;
+}
+
+.splash-content small {
+  font-size: 14px;
+  color: var(--text);
   opacity: 0.5;
-  user-select: none;
 }
-
-#splash .cloud:nth-child(1) { top: 120px; left: 10%; animation: cloudFloat 6s ease-in-out infinite; }
-#splash .cloud:nth-child(2) { top: 80px; right: 15%; animation: cloudFloat 8s ease-in-out infinite; animation-delay: 2s; }
-#splash .cloud:nth-child(3) { top: 200px; left: 30%; animation: cloudFloat 7s ease-in-out infinite; animation-delay: 1s; }
 
 .particle-container {
   position: fixed;
@@ -175,38 +207,50 @@ a { text-decoration: none; color: inherit; }
   will-change: transform, opacity;
 }
 
+@keyframes particleFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
+}
+
 .tree-stage.growing { animation: treeGrow 1s ease-out; }
 
-#splash h1 {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 12px;
-  letter-spacing: -0.02em;
+@keyframes treeGrow {
+  0% { transform: scale(0.5); opacity: 0; }
+  50% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-#splash p {
-  font-size: 16px;
-  color: var(--text);
-  opacity: 0.7;
-  margin-bottom: 8px;
+.header-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  z-index: 0;
+  opacity: 0.6;
+  overflow: hidden;
+  pointer-events: none;
 }
 
-#splash small {
-  font-size: 14px;
-  color: var(--text);
-  opacity: 0.5;
+.bg-scene {
+  width: 100%;
+  height: 100%;
+}
+
+.bg-scene .cloud {
+  animation: bgCloudFloat 12s ease-in-out infinite;
+}
+
+@keyframes bgCloudFloat {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(20px); }
 }
 
 #home .header {
   text-align: center;
   margin-bottom: 28px;
-}
-
-#home .header .moon {
-  font-size: 48px;
-  margin-bottom: 12px;
-  display: inline-block;
+  position: relative;
+  z-index: 1;
 }
 
 #home .header h2 {
@@ -221,20 +265,26 @@ a { text-decoration: none; color: inherit; }
   opacity: 0.7;
 }
 
+#home .prompt-text {
+  font-size: 14px;
+  opacity: 0.5;
+  margin-top: 8px;
+}
+
 #home .moods {
   display: flex;
   justify-content: space-around;
   margin-bottom: 28px;
-  gap: 12px;
+  gap: 8px;
 }
 
 #home .moods button {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border: none;
   border-radius: 50%;
   background: var(--card);
-  font-size: 28px;
+  font-size: 26px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -333,7 +383,7 @@ a { text-decoration: none; color: inherit; }
 }
 
 #home .quote-card .quote-icon { font-size: 24px; margin-bottom: 12px; }
-#home .quote-card .quote-text { font-size: 15px; font-style: italic; line-height: 1.8; margin-bottom: 8px; }
+#home .quote-card .quote-text { font-size: 15px; line-height: 1.8; margin-bottom: 8px; }
 #home .quote-card .quote-author { font-size: 13px; opacity: 0.5; }
 
 #chat { padding-top: 16px; padding-bottom: 20px; }
@@ -499,28 +549,28 @@ a { text-decoration: none; color: inherit; }
 
 #mood-journal .mood-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
   margin-bottom: 32px;
 }
 
 #mood-journal .mood-grid button {
-  padding: 24px 16px;
+  padding: 20px 12px;
   border: 2px solid transparent;
   border-radius: 20px;
   background: var(--card);
-  font-size: 32px;
+  font-size: 28px;
   cursor: pointer;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   align-items: center;
   font-family: inherit;
 }
 
-#mood-journal .mood-grid button span { font-size: 14px; font-weight: 500; color: var(--text); }
-#mood-journal .mood-grid button:hover { transform: scale(1.02); background: var(--secondary); }
+#mood-journal .mood-grid button span { font-size: 12px; font-weight: 500; color: var(--text); }
+#mood-journal .mood-grid button:hover { transform: scale(1.05); background: var(--secondary); }
 #mood-journal .mood-grid button.active {
   background: var(--secondary);
   border-color: var(--primary);
@@ -618,7 +668,7 @@ a { text-decoration: none; color: inherit; }
 
 #journey .journey-header p { font-size: 14px; color: var(--text-light); }
 
-#journey .progress-overall { margin-bottom: 32px; }
+#journey .progress-overall { margin-bottom: 24px; }
 #journey .progress-overall .label { font-size: 14px; color: var(--text-light); margin-bottom: 8px; }
 #journey .progress-overall .bar {
   height: 12px;
@@ -636,6 +686,35 @@ a { text-decoration: none; color: inherit; }
   display: flex;
   justify-content: space-between;
   margin-top: 8px;
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+.tree-visual {
+  text-align: center;
+  margin-bottom: 24px;
+  padding: 20px;
+  background: var(--card);
+  border-radius: 16px;
+}
+
+.tree-stage-display {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.tree-stage-display .tree-emoji {
+  font-size: 48px;
+  transition: transform 0.5s ease;
+}
+
+.tree-stage-display.growing .tree-emoji {
+  animation: treeGrow 0.8s ease-out;
+}
+
+.tree-stage-display .tree-label {
   font-size: 14px;
   color: var(--text-light);
 }
@@ -658,7 +737,7 @@ a { text-decoration: none; color: inherit; }
   gap: 4px;
   font-size: 13px;
   font-weight: 500;
-  cursor: default;
+  cursor: pointer;
   transition: all 0.2s ease;
 }
 
@@ -673,6 +752,7 @@ a { text-decoration: none; color: inherit; }
   transform: scale(1.05);
 }
 #journey .day-card.locked { opacity: 0.4; }
+#journey .day-card:hover:not(.locked) { transform: scale(1.05); }
 
 #journey .task-card .task-desc {
   font-size: 15px;
@@ -706,7 +786,7 @@ a { text-decoration: none; color: inherit; }
 
 #profile .profile-header {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 #profile .profile-header .avatar {
@@ -725,51 +805,98 @@ a { text-decoration: none; color: inherit; }
 #profile .profile-header h3 { font-size: 22px; font-weight: 600; margin-bottom: 6px; }
 #profile .profile-header p { font-size: 14px; color: var(--text-light); }
 
-#profile .stats-grid {
+.companion-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
-#profile .stat-card {
+.companion-item {
   background: var(--card);
   border-radius: 16px;
-  padding: 20px 12px;
+  padding: 20px;
   text-align: center;
   box-shadow: var(--shadow);
 }
 
-#profile .stat-card .value {
-  font-size: 24px;
+.companion-item .companion-value {
+  font-size: 32px;
   font-weight: 700;
   color: var(--button);
   margin-bottom: 4px;
 }
 
-#profile .stat-card .label {
+.companion-item .companion-label {
   font-size: 12px;
   color: var(--text-light);
 }
 
-#profile .chart-card { margin-bottom: 24px; }
-#profile .chart-card h4 { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
-
-#profile .chart-card .chart {
-  height: 100px;
+.streak-bar {
   display: flex;
-  align-items: flex-end;
+  justify-content: center;
   gap: 8px;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: var(--card);
+  border-radius: 16px;
 }
 
-#profile .chart-card .bar {
-  flex: 1;
-  background: var(--secondary);
-  border-radius: 4px 4px 0 0;
-  transition: height 0.3s ease;
+.streak-bar .streak-done {
+  font-size: 24px;
+  animation: streakPop 0.4s ease-out;
 }
 
-#profile .chart-card .bar.high { background: var(--primary); }
+.streak-bar .streak-empty {
+  font-size: 24px;
+  opacity: 0.3;
+}
+
+@keyframes streakPop {
+  0% { transform: scale(0); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+.growth-card {
+  background: var(--card);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+}
+
+.growth-card h4 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.growth-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.growth-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.growth-item .growth-label {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.growth-item .growth-value {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.growth-item .growth-value.up { color: #7EA68A; }
+.growth-item .growth-value.down { color: #C8956D; }
 
 #profile .quote-section {
   text-align: center;
@@ -780,7 +907,6 @@ a { text-decoration: none; color: inherit; }
 
 #profile .quote-section .quote-text {
   font-size: 16px;
-  font-style: italic;
   line-height: 1.6;
   margin-bottom: 8px;
 }
@@ -900,6 +1026,11 @@ nav .nav-item .icon { font-size: 20px; }
 
 #community .post-card .post-author { font-size: 14px; font-weight: 600; }
 #community .post-card .post-time { font-size: 12px; color: var(--text-light); }
+#community .post-card .post-hug-count {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-light);
+}
 
 #community .post-card .post-content {
   font-size: 15px;
@@ -974,7 +1105,7 @@ nav .nav-item .icon { font-size: 20px; }
   font-family: inherit;
 }
 
-.lang-toggle button:hover { background: var(--secondary); }
+.lang-toggle button:hover { background: var(--secondary); transform: scale(0.98); }
 
 @media (max-width: 480px) {
   .screen { padding: 16px 14px; }
@@ -982,11 +1113,15 @@ nav .nav-item .icon { font-size: 20px; }
   #chat .messages { min-height: 320px; max-height: 50vh; }
   .lang-toggle { top: 14px; right: 14px; }
   .lang-toggle button { padding: 6px 12px; font-size: 11px; }
-  #home .moods button { width: 56px; height: 56px; font-size: 24px; }
+  #home .moods button { width: 50px; height: 50px; font-size: 22px; }
+  #mood-journal .mood-grid button { font-size: 24px; padding: 16px 8px; }
+  #mood-journal .mood-grid button span { font-size: 11px; }
   #journey .day-cards { gap: 6px; }
   #journey .day-card { font-size: 12px; }
   nav .nav-item { width: 52px; font-size: 10px; }
   nav .nav-item .icon { font-size: 18px; }
+  .growth-stats { gap: 8px; }
+  .growth-item .growth-value { font-size: 16px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
