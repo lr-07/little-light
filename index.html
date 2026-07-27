@@ -368,77 +368,6 @@
         <div class="quote-date">— Your words</div>
       </div>
     </section>
-
-    <section id="pricing" class="screen">
-      <div class="back-bar">
-        <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 id="pricingTitle">Pricing</h2>
-      </div>
-      <div class="pricing-header">
-        <h3 id="pricingSubtitle">Choose your plan</h3>
-        <p id="pricingDesc">Every plan includes a gentle AI companion</p>
-      </div>
-      <div class="pricing-cards">
-        <div class="pricing-card free" onclick="selectPlan('free')">
-          <div class="pricing-badge" id="freeBadge">Free</div>
-          <div class="pricing-icon">✨</div>
-          <h4 id="freeTitle">Free</h4>
-          <div class="pricing-price">
-            <span class="price-value">0</span>
-            <span class="price-unit"></span>
-          </div>
-          <ul class="pricing-features">
-            <li id="freeFeature1">5 chats per day</li>
-            <li id="freeFeature2">Basic mood tracking</li>
-            <li id="freeFeature3">Community access</li>
-            <li id="freeFeature4" class="disabled">Unlimited chats</li>
-            <li id="freeFeature5" class="disabled">Advanced insights</li>
-            <li id="freeFeature6" class="disabled">Priority support</li>
-          </ul>
-          <button class="btn btn-outline" id="freeBtn">Get Started</button>
-        </div>
-        <div class="pricing-card premium" onclick="selectPlan('premium')">
-          <div class="pricing-badge popular" id="premiumBadge">Popular</div>
-          <div class="pricing-icon">⭐</div>
-          <h4 id="premiumTitle">Premium</h4>
-          <div class="pricing-price">
-            <span class="price-value">$9.99</span>
-            <span class="price-unit">/mo</span>
-          </div>
-          <ul class="pricing-features">
-            <li id="premiumFeature1">Unlimited chats</li>
-            <li id="premiumFeature2">Advanced mood tracking</li>
-            <li id="premiumFeature3">Community access</li>
-            <li id="premiumFeature4">Weekly insights report</li>
-            <li id="premiumFeature5">Custom journal prompts</li>
-            <li id="premiumFeature6">Priority support</li>
-          </ul>
-          <button class="btn" id="premiumBtn">Subscribe</button>
-        </div>
-        <div class="pricing-card annual" onclick="selectPlan('annual')">
-          <div class="pricing-badge" id="annualBadge">Best Value</div>
-          <div class="pricing-icon">🌟</div>
-          <h4 id="annualTitle">Annual</h4>
-          <div class="pricing-price">
-            <span class="price-value">$69.99</span>
-            <span class="price-unit">/yr</span>
-          </div>
-          <div class="pricing-save" id="annualSave">Save 33%</div>
-          <ul class="pricing-features">
-            <li id="annualFeature1">Everything in Premium</li>
-            <li id="annualFeature2">Yearly progress report</li>
-            <li id="annualFeature3">Exclusive content</li>
-            <li id="annualFeature4">Early access to new features</li>
-            <li id="annualFeature5">Custom companion themes</li>
-            <li id="annualFeature6">Dedicated support</li>
-          </ul>
-          <button class="btn btn-secondary" id="annualBtn">Subscribe</button>
-        </div>
-      </div>
-      <div class="pricing-footer">
-        <p id="pricingTerms">By subscribing, you agree to our Terms of Service and Privacy Policy</p>
-      </div>
-    </section>
   </div>
 
   <nav>
@@ -463,12 +392,37 @@
         <div class="icon">👤</div>
         <div>Profile</div>
       </div>
-      <div class="nav-item" onclick="navigateTo('pricing')">
-        <div class="icon">💎</div>
-        <div>Pricing</div>
-      </div>
     </div>
   </nav>
+
+  <div id="paywallOverlay" class="paywall-overlay" style="display: none;" onclick="closePaywall()">
+    <div class="paywall-modal" onclick="event.stopPropagation()">
+      <div class="paywall-close" onclick="closePaywall()">✕</div>
+      <div class="paywall-icon">💎</div>
+      <h3 id="paywallTitle">Daily chat limit reached</h3>
+      <p id="paywallDesc">You've used all 5 chats today. Upgrade to Premium for unlimited conversations.</p>
+      <div class="paywall-plans">
+        <div class="paywall-plan premium" onclick="selectPlan('premium')">
+          <div class="paywall-plan-badge" id="paywallPremiumBadge">Popular</div>
+          <div class="paywall-plan-title" id="paywallPremiumTitle">Premium</div>
+          <div class="paywall-plan-price">$9.99<span>/mo</span></div>
+          <div class="paywall-plan-feature">✓ Unlimited chats</div>
+          <div class="paywall-plan-feature">✓ Advanced insights</div>
+          <button class="btn" id="paywallPremiumBtn">Subscribe</button>
+        </div>
+        <div class="paywall-plan annual" onclick="selectPlan('annual')">
+          <div class="paywall-plan-badge" id="paywallAnnualBadge">Best Value</div>
+          <div class="paywall-plan-title" id="paywallAnnualTitle">Annual</div>
+          <div class="paywall-plan-price">$69.99<span>/yr</span></div>
+          <div class="paywall-plan-save" id="paywallAnnualSave">Save 33%</div>
+          <div class="paywall-plan-feature">✓ Everything in Premium</div>
+          <div class="paywall-plan-feature">✓ Yearly report</div>
+          <button class="btn btn-secondary" id="paywallAnnualBtn">Subscribe</button>
+        </div>
+      </div>
+      <button class="btn btn-outline" onclick="closePaywall()" id="paywallCloseBtn">Close</button>
+    </div>
+  </div>
 
   <script src="app.js?v=3" defer></script>
 </body>
