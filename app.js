@@ -1,8 +1,4 @@
-const _p1 = 'sk-2a0246f90ee2465a84';
-const _p2 = 'b2954897915b89';
-const DEEPSEEK_API_KEY = _p1 + _p2;
-const DEEPSEEK_API_URL = 'https://api.deepseek.com/v1/chat/completions';
-
+const API_BASE = 'https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev';
 const STORAGE_KEYS = {
   journal: 'dailyJournal',
   moodData: 'moodJournal',
@@ -10,7 +6,6 @@ const STORAGE_KEYS = {
   progress: 'journeyProgress',
   streak: 'streakCount',
   lastVisit: 'lastVisitDate',
-  subscription: 'lumi_subscription',
   chatCount: 'lumi_chat_count_'
 };
 
@@ -22,1153 +17,394 @@ const CHAT_LIMITS = {
 
 const LANGUAGES = {
   en: { name: 'English', native: 'English' },
-  zh: { name: 'Chinese', native: '中文' },
-  ja: { name: 'Japanese', native: '日本語' },
-  ko: { name: 'Korean', native: '한국어' },
-  es: { name: 'Spanish', native: 'Español' },
-  fr: { name: 'French', native: 'Français' }
+  fi: { name: 'Finnish', native: 'Suomen kieli' }
 };
 
 let currentLang = 'en';
 let chatHistory = [];
 
-const greetings = {
-  en: ['Good evening.', 'Welcome back.', 'How are you today?', 'I missed you.', 'Take a breath.'],
-  zh: ['晚上好 🌙', '你来了', '欢迎回来', '想你了', '深呼吸，慢慢来'],
-  ja: ['こんばんは 🌙', 'おかえりなさい', 'ようこそ', '会いたかったです', '深呼吸して、ゆっくり'],
-  ko: ['저녁이에요 🌙', '다녀오셨어요', '어서 오세요', '보고 싶었어요', '깊게 숨 쉬고, 천천히'],
-  es: ['Buenas noches.', 'Bienvenido de vuelta.', '¿Cómo estás hoy?', 'Te extrañé.', 'Respira y tómate tu tiempo.'],
-  fr: ['Bonsoir.', 'Bon retour.', 'Comment allez-vous aujourd\'hui ?', 'Tu m\'as manqué.', 'Respire et prends ton temps.']
+const timeGreetingMap = {
+  en: {
+    lateNight: 'Good night.',
+    morning: 'Good morning.',
+    afternoon: 'Good afternoon.',
+    evening: 'Good evening.'
+  },
+  fi: {
+    lateNight: 'Hyvää yötä.',
+    morning: 'Hyvää aamua.',
+    afternoon: 'Hyvää iltapäivää.',
+    evening: 'Hyvää iltaa.'
+  }
 };
 
 const responses = {
   en: {
-    homeTitle: 'Good evening.',
-    homeSubtitle: 'Today was hard.',
-    promptText: 'How are you feeling today?',
-    chatSubtitle: 'Take your time.\nI\'m here to listen.',
-    journalTitle: 'Today\'s Journal',
-    journalDesc: 'Write it down, it gets lighter',
-    journalPlaceholder: 'Write what\'s on your mind...',
-    journeyLabel: '30-Day Restart Plan',
+    welcomeSlogan: 'A small light for difficult days.',
+    welcomeDesc: 'No one should face difficult days alone.',
+    welcomeStart: 'Begin Your Journey',
+    welcomeCredit: 'With gentle care from Lumi',
+    homePrompt: 'How are you feeling today?',
+    comfortLine1: 'Take your time.',
+    comfortLine2: "I'm here to listen.",
+    talkToLumi: 'Talk with Lumi',
+    todaysJournal: "Today's Journal",
+    journalPlaceholder: "Write what's on your mind...",
+    littleJourney: 'Little Journey',
+    quoteLabel: 'Quote',
+    chatWelcome: 'You look a little tired today. Want to talk?',
+    chatPlaceholder: 'Tell me anything...',
     moodTitle: 'Mood Journal',
-    moodStep1: 'How are you feeling?',
-    moodStep2: 'What\'s weighing on you?',
-    moodStep3: 'Is there one small thing to be thankful for?',
-    journeyTitle: '30 Days of Restart',
+    moodStep1: 'How are you feeling today?',
+    moodStep2: "Where is the stress coming from?",
+    moodStep3: 'Is there one small thing to be thankful for today?',
+    moodHappy: 'Happy',
+    moodCalm: 'Calm',
+    moodSad: 'Sad',
+    moodOverwhelmed: 'Overwhelmed',
+    sourceWork: '💼 Work',
+    sourceMoney: '💰 Money',
+    sourceFamily: '👨‍👩‍👧 Family',
+    sourceRelationship: '💞 Relationship',
+    sourceHealth: '❤️ Health',
+    gratitudePlaceholder: "Today, I'm thankful for...",
+    saveJournal: 'Save',
+    journeyTitle: '30 Days to Restart',
     journeySubtitle: 'Every day is a new beginning',
     journeyDesc: 'Complete today\'s task, let the tree grow',
-    communityTitle: 'Tree Hole',
-    profileTitle: 'My Profile',
-    saveText: 'Save Journal',
+    overallProgress: 'Overall Progress',
+    stage1: 'Day 1-3',
+    stage2: 'Day 10',
+    stage3: 'Day 30',
+    yourJourney: 'Your Journey',
+    todaysTask: "Today's Task",
+    todayTaskPlaceholder: 'Take three deep breaths and name one thing that made you smile today.',
     markComplete: 'Mark Complete',
-    send: 'Send',
-    placeholder: 'Tell me anything...',
-    talkToLumi: 'Talk with Lumi',
-    continueText: 'Continue',
-    taskText: 'Complete today\'s task',
-    todayTask: 'Take three deep breaths and name one thing that made you smile today.',
-    chatWelcome: 'You look a little tired today. Want to talk?',
-    hugText: '🤗 Hug',
+    communityTitle: 'Tree Hole',
+    communityHeaderTitle: 'Anonymous Gentle Corner',
+    communityHeaderDesc: 'You are not alone here',
+    anonymousFriend: 'Anonymous Friend',
+    anonymousFriend2: 'Anonymous Friend',
+    anonymousFriend3: 'Anonymous Friend',
+    postTime2h: '2 hours ago',
+    postTime5h: '5 hours ago',
+    postTimeYesterday: 'Yesterday',
+    post1Content: 'Got paid today. After rent, I have $427 left in my bank account. So tired.',
+    post1Reply: "You've already worked so hard. You deserve a kind word today.",
+    post2Content: 'Went for a walk today and saw a beautiful sunset. Sometimes the little things matter most.',
+    post2Reply: 'Noticing such beautiful moments is a gentle thing in itself. Thank you for sharing this light.',
+    post3Content: 'Got rejected from the interview. Applied for months with no response, starting to doubt myself.',
+    post3Reply: "Rejection is painful. But today's events don't define who you are. You've been very brave.",
+    lumiReplies: 'Lumi replies',
+    lumiReplies2: 'Lumi replies',
+    lumiReplies3: 'Lumi replies',
+    hugText: '🤗 Hug Them',
+    hugText2: '🤗 Hug Them',
+    hugText3: '🤗 Hug Them',
     huggedText: '🤗 Hugged',
-    encourageText: '🌼 Encourage',
+    encourageText: '🌼 Leave Encouragement',
+    encourageText2: '🌼 Leave Encouragement',
+    encourageText3: '🌼 Leave Encouragement',
+    profileTitle: 'My Page',
+    profileName: 'Dear Friend',
+    profileDesc: 'Your gentle companion is here',
+    daysTogetherLabel: 'Days together ❤️',
+    streakLabel: 'Daily streak: 7 Days',
+    growthChanges: '🌱 Growth Changes',
+    stressLabel: 'Stress',
+    sleepLabel: 'Sleep',
+    happinessLabel: 'Happiness',
+    personalQuote: '"Slow down, you\'re still moving forward."',
+    personalQuoteLabel: 'Your personal quote',
     navHome: 'Home',
     navChat: 'Chat',
     navJournal: 'Journal',
     navCommunity: 'Community',
-    navProfile: 'Profile',
-    gratitudePlaceholder: "Today, I'm thankful for...",
-    moodStep1Desc: 'Pick the one that fits best',
-    moodStep2Desc: 'Select all that apply',
-    moodStep3Desc: 'Even just a warm cup of tea',
-    pricingTitle: 'Pricing',
-    pricingSubtitle: 'Choose your plan',
-    pricingDesc: 'Every plan includes a gentle AI companion',
-    freeTitle: 'Free',
-    freeBadge: 'Free',
-    freeFeature1: '5 chats per day',
-    freeFeature2: 'Basic mood tracking',
-    freeFeature3: 'Community access',
-    freeFeature4: 'Unlimited chats',
-    freeFeature5: 'Advanced insights',
-    freeFeature6: 'Priority support',
-    freeBtn: 'Get Started',
-    premiumTitle: 'Premium',
-    premiumBadge: 'Popular',
-    premiumFeature1: 'Unlimited chats',
-    premiumFeature2: 'Advanced mood tracking',
-    premiumFeature3: 'Community access',
-    premiumFeature4: 'Weekly insights report',
-    premiumFeature5: 'Custom journal prompts',
-    premiumFeature6: 'Priority support',
-    premiumBtn: 'Subscribe',
-    annualTitle: 'Annual',
-    annualBadge: 'Best Value',
-    annualSave: 'Save 33%',
-    annualFeature1: 'Everything in Premium',
-    annualFeature2: 'Yearly progress report',
-    annualFeature3: 'Exclusive content',
-    annualFeature4: 'Early access to new features',
-    annualFeature5: 'Custom companion themes',
-    annualFeature6: 'Dedicated support',
-    annualBtn: 'Subscribe',
-    pricingTerms: 'By subscribing, you agree to our Terms of Service and Privacy Policy',
-    paywallTitle: 'Daily chat limit reached',
-    paywallDesc: 'You\'ve used all 5 daily chats. Upgrade to Premium for unlimited conversations.',
-    paywallUpgrade: 'Upgrade now',
-    paywallClose: 'Close',
-    checkoutTitle: 'Complete your purchase',
-    checkoutDesc: 'Secure payment powered by Stripe',
-    checkoutNote: 'This is a demo mode - no real payment will be processed',
-    checkoutPay: 'Continue to payment',
-    checkoutCancel: 'Cancel',
-    chatLimitText: 'Daily chats:',
-    chatUnlimited: '✓ Unlimited chats',
-    navPricing: 'Pricing'
+    navProfile: 'Profile'
   },
-  zh: {
-    homeTitle: '晚上好 🌙',
-    homeSubtitle: '今天辛苦了。',
-    promptText: '今天心情怎么样？',
-    chatSubtitle: '慢慢来，\n我在这里听你说。',
-    journalTitle: '今天发生了什么？',
-    journalDesc: '写下来就会轻一点',
-    journalPlaceholder: '把心里的话写下来...',
-    journeyLabel: '30天回血计划',
-    moodTitle: '情绪记录',
-    moodStep1: '今天感觉怎么样？',
-    moodStep2: '压力来自哪里？',
-    moodStep3: '今天有没有一件值得感谢的小事？',
-    journeyTitle: '30天重新出发',
-    journeySubtitle: '每一天，都是新的开始',
-    journeyDesc: '完成今天的小事，让树长大一点',
-    communityTitle: '树洞社区',
-    profileTitle: '我的',
-    saveText: '保存记录',
-    markComplete: '完成今天的任务',
-    send: '发送',
-    placeholder: '告诉我任何事...',
-    talkToLumi: '和 Lumi 聊聊',
-    continueText: '继续',
-    taskText: '完成今天的任务',
-    todayTask: '深呼吸三次，说出一件让你微笑的小事。',
-    chatWelcome: '今天看起来有一点累。想和我聊聊吗？',
-    hugText: '🤗 抱抱TA',
-    huggedText: '🤗 已抱抱',
-    encourageText: '🌼 留一句鼓励',
-    navHome: '首页',
-    navChat: '聊天',
-    navJournal: '记录',
-    navCommunity: '树洞',
-    navProfile: '我的',
-    gratitudePlaceholder: '今天，我感谢...',
-    moodStep1Desc: '选一个最贴近的',
-    moodStep2Desc: '可以多选',
-    moodStep3Desc: '哪怕只是一杯热茶',
-    pricingTitle: '订阅',
-    pricingSubtitle: '选择你的方案',
-    pricingDesc: '每个方案都包含温柔的AI伴侣',
-    freeTitle: '免费版',
-    freeBadge: '免费',
-    freeFeature1: '每天5次聊天',
-    freeFeature2: '基础情绪追踪',
-    freeFeature3: '社区访问',
-    freeFeature4: '无限聊天',
-    freeFeature5: '高级洞察',
-    freeFeature6: '优先支持',
-    freeBtn: '开始使用',
-    premiumTitle: 'Premium',
-    premiumBadge: '热门',
-    premiumFeature1: '无限聊天',
-    premiumFeature2: '高级情绪追踪',
-    premiumFeature3: '社区访问',
-    premiumFeature4: '每周洞察报告',
-    premiumFeature5: '自定义日记提示',
-    premiumFeature6: '优先支持',
-    premiumBtn: '订阅',
-    annualTitle: '年度版',
-    annualBadge: '最优惠',
-    annualSave: '节省33%',
-    annualFeature1: '包含Premium所有功能',
-    annualFeature2: '年度进度报告',
-    annualFeature3: '独家内容',
-    annualFeature4: '新功能抢先体验',
-    annualFeature5: '自定义主题',
-    annualFeature6: '专属支持',
-    annualBtn: '订阅',
-    pricingTerms: '订阅即表示您同意我们的服务条款和隐私政策',
-    paywallTitle: '每日聊天次数已用完',
-    paywallDesc: '您已用完今日5次聊天机会。升级到Premium享受无限对话。',
-    paywallUpgrade: '立即升级',
-    paywallClose: '关闭',
-    checkoutTitle: '完成购买',
-    checkoutDesc: '由Stripe安全支付',
-    checkoutNote: '这是演示模式 - 不会进行真实支付',
-    checkoutPay: '继续支付',
-    checkoutCancel: '取消',
-    chatLimitText: '今日聊天:',
-    chatUnlimited: '✓ 无限聊天',
-    navPricing: '订阅'
-  },
-  ja: {
-    homeTitle: 'こんばんは 🌙',
-    homeSubtitle: '今日はお疲れ様でした。',
-    promptText: '今日の気分はどうですか？',
-    chatSubtitle: 'ゆっくりでいいよ、\nここで話してね。',
-    journalTitle: '今日何がありましたか？',
-    journalDesc: '書き出すと少し軽くなります',
-    journalPlaceholder: '心にあることを書いてください...',
-    journeyLabel: '30日間の回復プラン',
-    moodTitle: '気持ちの記録',
-    moodStep1: '今日の気分は？',
-    moodStep2: '何が重くのしかかっていますか？',
-    moodStep3: '今日、感謝できる小さなことはありましたか？',
-    journeyTitle: '30日で再出発',
-    journeySubtitle: '毎日が新しい始まりです',
-    journeyDesc: '今日の小さなことを完了して、木を大きくしましょう',
-    communityTitle: 'ツリーホール',
-    profileTitle: '私の',
-    saveText: '記録を保存',
-    markComplete: '今日のタスクを完了',
-    send: '送信',
-    placeholder: '何でも話してください...',
-    talkToLumi: 'ルミと話す',
-    continueText: '続ける',
-    taskText: '今日のタスクを完了',
-    todayTask: '3回深呼吸して、あなたを笑顔にした小さなことを一つ言ってみましょう。',
-    chatWelcome: '今日は少し疲れているようですね。話したいですか？',
-    hugText: '🤗 ハグする',
-    huggedText: '🤗 ハグした',
-    encourageText: '🌼 励ます',
-    navHome: 'ホーム',
-    navChat: 'チャット',
-    navJournal: '記録',
-    navCommunity: 'コミュニティ',
-    navProfile: 'プロフィール',
-    gratitudePlaceholder: '今日、感謝したいことは...',
-    moodStep1Desc: '一番近いものを選んでください',
-    moodStep2Desc: 'いくつでも選べます',
-    moodStep3Desc: '温かいお茶一杯でもいい',
-    pricingTitle: '料金',
-    pricingSubtitle: 'プランを選択',
-    pricingDesc: 'どのプランにも優しいAIコンパニオンが含まれます',
-    freeTitle: '無料',
-    freeBadge: '無料',
-    freeFeature1: '毎日5回のチャット',
-    freeFeature2: '基本的な気分追跡',
-    freeFeature3: 'コミュニティアクセス',
-    freeFeature4: '無制限チャット',
-    freeFeature5: '高度な洞察',
-    freeFeature6: '優先サポート',
-    freeBtn: '始める',
-    premiumTitle: 'プレミアム',
-    premiumBadge: '人気',
-    premiumFeature1: '無制限チャット',
-    premiumFeature2: '高度な気分追跡',
-    premiumFeature3: 'コミュニティアクセス',
-    premiumFeature4: '毎週の洞察レポート',
-    premiumFeature5: 'カスタムジャーナルプロンプト',
-    premiumFeature6: '優先サポート',
-    premiumBtn: '購入',
-    annualTitle: '年間',
-    annualBadge: '最もお得',
-    annualSave: '33%節約',
-    annualFeature1: 'プレミアム全ての機能',
-    annualFeature2: '年間進捗レポート',
-    annualFeature3: '独占コンテンツ',
-    annualFeature4: '新機能先行アクセス',
-    annualFeature5: 'カスタムコンパニオンテーマ',
-    annualFeature6: '専属サポート',
-    annualBtn: '購入',
-    pricingTerms: '購入することで、利用規約とプライバシーポリシーに同意したものとみなします',
-    paywallTitle: '毎日のチャット上限に達しました',
-    paywallDesc: '今日の5回のチャットを使い切りました。プレミアムにアップグレードして無制限の会話をお楽しみください。',
-    paywallUpgrade: '今すぐアップグレード',
-    paywallClose: '閉じる',
-    checkoutTitle: '購入を完了',
-    checkoutDesc: 'Stripeによる安全な決済',
-    checkoutNote: 'これはデモモードです - 実際の支払いは行われません',
-    checkoutPay: '決済に進む',
-    checkoutCancel: 'キャンセル',
-    chatLimitText: '今日のチャット:',
-    chatUnlimited: '✓ 無制限チャット',
-    navPricing: '料金'
-  },
-  ko: {
-    homeTitle: '저녁이에요 🌙',
-    homeSubtitle: '오늘도 수고하셨어요.',
-    promptText: '오늘 기분이 어떠신가요?',
-    chatSubtitle: '천천히 말해도 돼요,\n여기서 들어줄게요.',
-    journalTitle: '오늘 무슨 일이 있었나요?',
-    journalDesc: '적어내면 조금 가벼워져요',
-    journalPlaceholder: '마음속 이야기를 적어주세요...',
-    journeyLabel: '30일 회복 플랜',
-    moodTitle: '기록하기',
-    moodStep1: '오늘 기분이 어떠신가요?',
-    moodStep2: '무엇이 무겁게 느껴지나요?',
-    moodStep3: '오늘 고마운 작은 일이 있었나요?',
-    journeyTitle: '30일 다시 시작하기',
-    journeySubtitle: '매일이 새로운 시작이에요',
-    journeyDesc: '오늘의 작은 일을 완료해서 나무를 키워보세요',
-    communityTitle: '나무구멍 커뮤니티',
-    profileTitle: '프로필',
-    saveText: '기록 저장',
-    markComplete: '오늘의 태스크 완료',
-    send: '보내기',
-    placeholder: '무슨 말이든 해주세요...',
-    talkToLumi: '루미와 대화하기',
-    continueText: '계속',
-    taskText: '오늘의 태스크 완료',
-    todayTask: '세 번 깊게 숨 쉬고, 당신을 웃게 한 작은 일 하나를 말해보세요.',
-    chatWelcome: '오늘 조금 피곤해 보여요. 이야기하고 싶나요?',
-    hugText: '🤗 안아주기',
-    huggedText: '🤗 안아줬어요',
-    encourageText: '🌼 응원하기',
-    navHome: '홈',
-    navChat: '채팅',
-    navJournal: '기록',
-    navCommunity: '커뮤니티',
-    navProfile: '프로필',
-    gratitudePlaceholder: '오늘 고마운 일은...',
-    moodStep1Desc: '가장 가까운 것을 선택하세요',
-    moodStep2Desc: '여러 개 선택 가능',
-    moodStep3Desc: '따뜻한 차 한 잔이라도 좋아요',
-    pricingTitle: '가격',
-    pricingSubtitle: '플랜을 선택하세요',
-    pricingDesc: '모든 플랜에 친절한 AI 컴패니언이 포함됩니다',
-    freeTitle: '무료',
-    freeBadge: '무료',
-    freeFeature1: '매일 5회 채팅',
-    freeFeature2: '기본 기분 추적',
-    freeFeature3: '커뮤니티 액세스',
-    freeFeature4: '무제한 채팅',
-    freeFeature5: '고급 인사이트',
-    freeFeature6: '우선 지원',
-    freeBtn: '시작하기',
-    premiumTitle: '프리미엄',
-    premiumBadge: '인기',
-    premiumFeature1: '무제한 채팅',
-    premiumFeature2: '고급 기분 추적',
-    premiumFeature3: '커뮤니티 액세스',
-    premiumFeature4: '주간 인사이트 보고서',
-    premiumFeature5: '커스텀 저널 프롬프트',
-    premiumFeature6: '우선 지원',
-    premiumBtn: '구독',
-    annualTitle: '연간',
-    annualBadge: '최적의 가치',
-    annualSave: '33% 절약',
-    annualFeature1: '프리미엄 모든 기능',
-    annualFeature2: '연간 진행 보고서',
-    annualFeature3: '독점 콘텐츠',
-    annualFeature4: '새 기능 선행 접근',
-    annualFeature5: '커스텀 컴패니언 테마',
-    annualFeature6: '전용 지원',
-    annualBtn: '구독',
-    pricingTerms: '구독하면 서비스 약관과 개인정보 보호 정책에 동의하는 것으로 간주합니다',
-    paywallTitle: '일일 채팅 제한에 도달했습니다',
-    paywallDesc: '오늘 5회 채팅을 모두 사용했습니다. 프리미엄으로 업그레이드하여 무제한 대화를 즐겨보세요.',
-    paywallUpgrade: '지금 업그레이드',
-    paywallClose: '닫기',
-    checkoutTitle: '구매 완료',
-    checkoutDesc: 'Stripe에 의한 안전한 결제',
-    checkoutNote: '이것은 데모 모드입니다 - 실제 결제는 이루어지지 않습니다',
-    checkoutPay: '결제 진행',
-    checkoutCancel: '취소',
-    chatLimitText: '오늘 채팅:',
-    chatUnlimited: '✓ 무제한 채팅',
-    navPricing: '가격'
-  },
-  es: {
-    homeTitle: 'Buenas noches 🌙',
-    homeSubtitle: 'Hoy fue un día difícil.',
-    promptText: '¿Cómo te sientes hoy?',
-    chatSubtitle: 'Tómate tu tiempo,\nestoy aquí para escucharte.',
-    journalTitle: '¿Qué pasó hoy?',
-    journalDesc: 'Escríbelo, se siente más ligero',
-    journalPlaceholder: 'Escribe lo que tienes en mente...',
-    journeyLabel: 'Plan de recuperación de 30 días',
-    moodTitle: 'Diario de emociones',
-    moodStep1: '¿Cómo te sientes?',
-    moodStep2: '¿Qué te pesa?',
-    moodStep3: '¿Hay una pequeña cosa por la que estar agradecido hoy?',
-    journeyTitle: '30 días para recomenzar',
-    journeySubtitle: 'Cada día es un nuevo comienzo',
-    journeyDesc: 'Completa la pequeña tarea de hoy, deja crecer el árbol',
-    communityTitle: 'Árbol Hueco',
-    profileTitle: 'Mi Perfil',
-    saveText: 'Guardar diario',
-    markComplete: 'Marcar completo',
-    send: 'Enviar',
-    placeholder: 'Dime cualquier cosa...',
-    talkToLumi: 'Hablar con Lumi',
-    continueText: 'Continuar',
-    taskText: 'Completa la tarea de hoy',
-    todayTask: 'Respira tres veces profundas y nombra una cosa que te hizo sonreír hoy.',
-    chatWelcome: 'Pareces un poco cansado hoy. ¿Quieres hablar?',
-    hugText: '🤗 Abrazar',
-    huggedText: '🤗 Abrazado',
-    encourageText: '🌼 Animar',
-    navHome: 'Inicio',
-    navChat: 'Chat',
-    navJournal: 'Diario',
-    navCommunity: 'Comunidad',
-    navProfile: 'Perfil',
-    gratitudePlaceholder: 'Hoy, estoy agradecido por...',
-    moodStep1Desc: 'Elige el que mejor se ajuste',
-    moodStep2Desc: 'Selecciona todos los que apliquen',
-    moodStep3Desc: 'Incluso una taza de té caliente',
-    pricingTitle: 'Precios',
-    pricingSubtitle: 'Elige tu plan',
-    pricingDesc: 'Todos los planes incluyen un compañero AI gentil',
-    freeTitle: 'Gratis',
-    freeBadge: 'Gratis',
-    freeFeature1: '5 chats por día',
-    freeFeature2: 'Seguimiento de humor básico',
-    freeFeature3: 'Acceso a comunidad',
-    freeFeature4: 'Chats ilimitados',
-    freeFeature5: 'Perspectivas avanzadas',
-    freeFeature6: 'Soporte prioritario',
-    freeBtn: 'Empezar',
-    premiumTitle: 'Premium',
-    premiumBadge: 'Popular',
-    premiumFeature1: 'Chats ilimitados',
-    premiumFeature2: 'Seguimiento de humor avanzado',
-    premiumFeature3: 'Acceso a comunidad',
-    premiumFeature4: 'Informe semanal de perspectivas',
-    premiumFeature5: 'Prompts personalizados para diario',
-    premiumFeature6: 'Soporte prioritario',
-    premiumBtn: 'Suscribirse',
-    annualTitle: 'Anual',
-    annualBadge: 'Mejor valor',
-    annualSave: 'Ahorra un 33%',
-    annualFeature1: 'Todo en Premium',
-    annualFeature2: 'Informe anual de progreso',
-    annualFeature3: 'Contenido exclusivo',
-    annualFeature4: 'Acceso anticipado a nuevas funciones',
-    annualFeature5: 'Temas personalizados para compañero',
-    annualFeature6: 'Soporte dedicado',
-    annualBtn: 'Suscribirse',
-    pricingTerms: 'Al suscribirse, aceptas nuestros Términos de Servicio y Política de Privacidad',
-    paywallTitle: 'Límite diario de chats alcanzado',
-    paywallDesc: 'Has usado tus 5 chats diarios. Actualiza a Premium para conversaciones ilimitadas.',
-    paywallUpgrade: 'Actualizar ahora',
-    paywallClose: 'Cerrar',
-    checkoutTitle: 'Completa tu compra',
-    checkoutDesc: 'Pago seguro con Stripe',
-    checkoutNote: 'Este es un modo de demostración - no se procesará ningún pago real',
-    checkoutPay: 'Continuar al pago',
-    checkoutCancel: 'Cancelar',
-    chatLimitText: 'Chats diarios:',
-    chatUnlimited: '✓ Chats ilimitados',
-    navPricing: 'Precios'
-  },
-  fr: {
-    homeTitle: 'Bonsoir 🌙',
-    homeSubtitle: 'La journée a été dure.',
-    promptText: 'Comment te sens-tu aujourd\'hui ?',
-    chatSubtitle: 'Prends ton temps,\nje suis là pour écouter.',
-    journalTitle: 'Qu\'il s\'est passé aujourd\'hui ?',
-    journalDesc: 'Écris-le, ça devient plus léger',
-    journalPlaceholder: 'Écris ce que tu as sur le cœur...',
-    journeyLabel: 'Plan de récupération de 30 jours',
-    moodTitle: 'Journal des émotions',
-    moodStep1: 'Comment te sens-tu ?',
-    moodStep2: 'Qu\'est-ce qui te pèse ?',
-    moodStep3: 'Y a-t-il une petite chose dont tu peux être reconnaissant aujourd\'hui ?',
-    journeyTitle: '30 jours pour recommencer',
-    journeySubtitle: 'Chaque jour est un nouveau départ',
-    journeyDesc: 'Complète la petite tâche du jour, laisse grandir l\'arbre',
-    communityTitle: 'Trou Communautaire',
-    profileTitle: 'Mon Profil',
-    saveText: 'Enregistrer',
-    markComplete: 'Marquer comme fait',
-    send: 'Envoyer',
-    placeholder: 'Dis-moi tout...',
-    talkToLumi: 'Parler avec Lumi',
-    continueText: 'Continuer',
-    taskText: 'Complète la tâche du jour',
-    todayTask: 'Respire trois fois profondément et nomme une chose qui t\'a fait sourire aujourd\'hui.',
-    chatWelcome: 'Tu as l\'air un peu fatigué aujourd\'hui. Tu veux parler ?',
-    hugText: '🤗 Serrer',
-    huggedText: '🤗 Serré',
-    encourageText: '🌼 Encourager',
-    navHome: 'Accueil',
-    navChat: 'Discussion',
-    navJournal: 'Journal',
-    navCommunity: 'Communauté',
-    navProfile: 'Profil',
-    gratitudePlaceholder: "Aujourd'hui, je suis reconnaissant pour...",
-    moodStep1Desc: 'Choisis celui qui te ressemble le plus',
-    moodStep2Desc: 'Sélectionne tout ce qui s\'applique',
-    moodStep3Desc: 'Même une tasse de thé chaude',
-    pricingTitle: 'Tarifs',
-    pricingSubtitle: 'Choisissez votre plan',
-    pricingDesc: 'Tous les plans incluent un compagnon AI gentil',
-    freeTitle: 'Gratuit',
-    freeBadge: 'Gratuit',
-    freeFeature1: '5 conversations par jour',
-    freeFeature2: 'Suivi d\'humeur de base',
-    freeFeature3: 'Accès à la communauté',
-    freeFeature4: 'Conversations illimitées',
-    freeFeature5: 'Analyses avancées',
-    freeFeature6: 'Support prioritaire',
-    freeBtn: 'Commencer',
-    premiumTitle: 'Premium',
-    premiumBadge: 'Populaire',
-    premiumFeature1: 'Conversations illimitées',
-    premiumFeature2: 'Suivi d\'humeur avancé',
-    premiumFeature3: 'Accès à la communauté',
-    premiumFeature4: 'Rapport hebdomadaire d\'analyses',
-    premiumFeature5: 'Suggestions personnalisées pour le journal',
-    premiumFeature6: 'Support prioritaire',
-    premiumBtn: 'S\'abonner',
-    annualTitle: 'Annuel',
-    annualBadge: 'Meilleure valeur',
-    annualSave: 'Économisez 33%',
-    annualFeature1: 'Tout ce qui est dans Premium',
-    annualFeature2: 'Rapport annuel de progression',
-    annualFeature3: 'Contenu exclusif',
-    annualFeature4: 'Accès anticipé aux nouvelles fonctionnalités',
-    annualFeature5: 'Thèmes personnalisés pour le compagnon',
-    annualFeature6: 'Support dédié',
-    annualBtn: 'S\'abonner',
-    pricingTerms: 'En vous abonnant, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité',
-    paywallTitle: 'Limite quotidienne atteinte',
-    paywallDesc: 'Vous avez utilisé vos 5 conversations du jour. Passez à Premium pour des conversations illimitées.',
-    paywallUpgrade: 'Mettre à niveau maintenant',
-    paywallClose: 'Fermer',
-    checkoutTitle: 'Compléter votre achat',
-    checkoutDesc: 'Paiement sécurisé par Stripe',
-    checkoutNote: 'Ceci est un mode démo - aucun paiement réel ne sera effectué',
-    checkoutPay: 'Poursuivre vers le paiement',
-    checkoutCancel: 'Annuler',
-    chatLimitText: 'Conversations du jour:',
-    chatUnlimited: '✓ Conversations illimitées',
-    navPricing: 'Tarifs'
+  fi: {
+    welcomeSlogan: 'Pieni valo vaikeille päiville.',
+    welcomeDesc: 'Kukaan ei saa kohdata vaikeita päiviä yksin.',
+    welcomeStart: 'Aloita matkasi',
+    welcomeCredit: 'Lumin lempeällä hoidolla',
+    homePrompt: 'Miltä sinä tunnet olosi tänään?',
+    comfortLine1: 'Ota aikasi.',
+    comfortLine2: 'Olen täällä kuuntelemassa.',
+    talkToLumi: 'Juttele Lumin kanssa',
+    todaysJournal: 'Päivän päiväkirja',
+    journalPlaceholder: 'Kirjoita mitä mielessäsi on...',
+    littleJourney: 'Pieni matka',
+    quoteLabel: 'Lainaus',
+    chatWelcome: 'Näytät hieman väsyneeltä tänään. Haluatko jutella?',
+    chatPlaceholder: 'Kerro minulle mikä tahansa...',
+    moodTitle: 'Mielipäiväkirja',
+    moodStep1: 'Miltä sinä tunnet olosi tänään?',
+    moodStep2: 'Mistä stressi tulee?',
+    moodStep3: 'Onko yksi pieni asia josta olla kiitollinen tänään?',
+    moodHappy: 'Iloinen',
+    moodCalm: 'Rauhallinen',
+    moodSad: 'Surullinen',
+    moodOverwhelmed: 'Ylikuormitettu',
+    sourceWork: '💼 Työ',
+    sourceMoney: '💰 Rahaa',
+    sourceFamily: '👨‍👩‍👧 Perhe',
+    sourceRelationship: '💞 Suhde',
+    sourceHealth: '❤️ Terveys',
+    gratitudePlaceholder: "Tänään olen kiitollinen...",
+    saveJournal: 'Tallenna',
+    journeyTitle: '30 päivää alkaa uudelleen',
+    journeySubtitle: 'Joka päivä on uusi alku',
+    journeyDesc: 'T完成今日的任务，让树木生长',
+    overallProgress: 'Kokonaisedistyminen',
+    stage1: 'Päivä 1-3',
+    stage2: 'Päivä 10',
+    stage3: 'Päivä 30',
+    yourJourney: 'Sinun matkasi',
+    todaysTask: 'Tänään tehtävä',
+    todayTaskPlaceholder: 'Hengitä syvään kolme kertaa ja mainitse yksi asia joka sai sinut hymyilemään tänään.',
+    markComplete: 'Merkitse valmiiksi',
+    communityTitle: 'Puuhunreikä',
+    communityHeaderTitle: 'Anonyymi lempeä nurkka',
+    communityHeaderDesc: 'Et ole yksin täällä',
+    anonymousFriend: 'Anonyymi ystävä',
+    anonymousFriend2: 'Anonyymi ystävä',
+    anonymousFriend3: 'Anonyymi ystävä',
+    postTime2h: '2 tuntia sitten',
+    postTime5h: '5 tuntia sitten',
+    postTimeYesterday: 'Eilen',
+    post1Content: 'Sain palkkaa tänään. Vuokran jälkeen pankkitililläni on $427. Olen niin väsynyt.',
+    post1Reply: 'Olet jo työskennellyt niin kovasti. Ansaitset lempeän sanan tänään.',
+    post2Content: 'Kävin kävelyllä tänään ja näin kauniin auringonlaskun. Joskus pienet asiat merkitsevät eniten.',
+    post2Reply: 'Tällaisten kauniiden hetkien huomaaminen on itsessään lempeä asia. Kiitos kun jaoit tämän valon.',
+    post3Content: 'Sain hylkäämisen haastattelusta. Hain kuukausia ilman vastausta, alkaa epäilyttämään itseäni.',
+    post3Reply: 'Hylkääminen on kivuliasta. Mutta tämän päivän tapahtumat eivät määritä kuka olet. Olet ollut hyvin rohkea.',
+    lumiReplies: 'Lumi vastaa',
+    lumiReplies2: 'Lumi vastaa',
+    lumiReplies3: 'Lumi vastaa',
+    hugText: '🤗 Halaa häntä',
+    hugText2: '🤗 Halaa häntä',
+    hugText3: '🤗 Halaa häntä',
+    huggedText: '🤗 Halattu',
+    encourageText: '🌼 Jätä rohaisuus',
+    encourageText2: '🌼 Jätä rohaisuus',
+    encourageText3: '🌼 Jätä rohaisuus',
+    profileTitle: 'Minun sivuni',
+    profileName: 'Rakas ystävä',
+    profileDesc: 'Sinun lempeä kumppanisi on täällä',
+    daysTogetherLabel: 'Päivät yhdessä ❤️',
+    streakLabel: 'Päivittäinen putki: 7 päivää',
+    growthChanges: '🌱 Kasvumuutokset',
+    stressLabel: 'Stressi',
+    sleepLabel: 'Uni',
+    happinessLabel: 'Onnellisuus',
+    personalQuote: '"Hidastamalla et silti ole paikoillaan."',
+    personalQuoteLabel: 'Sinun oma lainauksesi',
+    navHome: 'Etusivu',
+    navChat: 'Keskustelu',
+    navJournal: 'Päiväkirja',
+    navCommunity: 'Yhteisö',
+    navProfile: 'Profiili'
   }
 };
 
-const lumiFallbackPatterns = {
+const encourageMessages = {
   en: [
-    { empathy: 'That sounds really hard.', ack: 'Thank you for telling me.', question: 'Do you want to share more?' },
-    { empathy: 'I can hear how much this weighs on you.', ack: 'It takes courage to talk about this.', question: 'How long have you been feeling this way?' },
-    { empathy: 'I\'m so sorry you\'re going through this.', ack: 'Whatever you\'re feeling is valid.', question: 'Is there anything I can do to help?' },
-    { empathy: 'That must have hurt.', ack: 'You\'re not alone in this.', question: 'What was the hardest part for you?' },
-    { empathy: 'It sounds like you\'ve been carrying a lot.', ack: 'I admire your strength for keeping going.', question: 'Would you like to talk about it more?' },
-    { empathy: 'I can imagine how exhausting that is.', ack: 'Thank you for trusting me with this.', question: 'What do you need right now?' },
-    { empathy: 'That doesn\'t sound fair.', ack: 'Your feelings matter.', question: 'How have you been coping?' },
-    { empathy: 'I\'m here with you in this.', ack: 'You don\'t have to carry this alone.', question: 'What would help you feel better today?' }
+    'You are braver than you think.',
+    'This moment will pass.',
+    "You're not alone in this.",
+    'It\'s okay to not be okay.',
+    'You deserve kindness today.',
+    'Small steps still move you forward.',
+    "Tomorrow is a new page.",
+    "You're doing better than you know."
   ],
-  zh: [
-    { empathy: '这真的很不容易。', ack: '谢谢你愿意告诉我。', question: '想多说说吗？' },
-    { empathy: '我能感受到你的疲惫。', ack: '愿意说出来就已经很勇敢了。', question: '这种感觉持续多久了？' },
-    { empathy: '听到你经历这些，我真的很心疼。', ack: '你的感受都是真实的。', question: '现在有什么我可以帮你的吗？' },
-    { empathy: '这一定很痛。', ack: '你不是一个人在面对。', question: '最让你难过的是什么部分？' },
-    { empathy: '感觉你承受了很多。', ack: '你还在坚持，这本身就很了不起。', question: '想聊聊吗？' },
-    { empathy: '我能想象这有多累。', ack: '谢谢你信任我。', question: '你现在最需要什么？' },
-    { empathy: '这不公平。', ack: '你的感受很重要。', question: '你是怎么熬过来的？' },
-    { empathy: '我在这里陪着你。', ack: '你不必独自承担。', question: '今天什么能让你感觉好一点？' }
-  ],
-  ja: [
-    { empathy: 'それは本当に大変ですね。', ack: '話してくれてありがとう。', question: 'もう少し話してくれますか？' },
-    { empathy: 'その辛さが伝わってきます。', ack: '話すことは勇気が必要なことです。', question: 'どれくらいの間、そう感じていますか？' },
-    { empathy: 'そんな経験をしているなんて、本当に辛いですね。', ack: 'どんな感情も大切です。', question: '何かできることはありますか？' },
-    { empathy: 'それは痛かったですね。', ack: '一人ではありませんよ。', question: '一番辛かったのはどんな部分ですか？' },
-    { empathy: 'たくさんのことを背負ってきたのですね。', ack: '頑張り続けていることが素晴らしいです。', question: 'もっと話したいですか？' },
-    { empathy: 'どれほど疲れているか想像できます。', ack: '信じてくれてありがとう。', question: '今、一番必要なものは何ですか？' },
-    { empathy: 'それは理不尽ですね。', ack: 'あなたの気持ちは大切です。', question: 'どうやって乗り越えてきましたか？' },
-    { empathy: 'ここにいますよ。', ack: '一人で抱え込まなくていいです。', question: '今日、少しでも良くなるにはどうしたらいいですか？' }
-  ],
-  ko: [
-    { empathy: '정말 힘드셨겠네요.', ack: '이야기해 주셔서 감사해요.', question: '더 이야기해 주실 수 있나요?' },
-    { empathy: '얼마나 무거운 짐을 지고 계신지 느껴져요.', ack: '이야기하는 건 용기가 필요한 일이에요.', question: '얼마나 오래 이런 느낌이셨나요?' },
-    { empathy: '그런 일을 겪고 계시다니 정말 마음이 아파요.', ack: '당신의 감정은 모두 소중해요.', question: '제가 도와드릴 수 있는 게 있나요?' },
-    { empathy: '정말 아팠겠네요.', ack: '당신은 혼자가 아니에요.', question: '가장 힘들었던 부분은 어디인가요?' },
-    { empathy: '많은 것을 감당해 오셨네요.', ack: '포기하지 않고 버텨온 게 정말 대단해요.', question: '더 이야기하고 싶나요?' },
-    { empathy: '얼마나 지치셨는지 상상이 가요.', ack: '믿어주셔서 감사해요.', question: '지금 가장 필요한 게 무엇인가요?' },
-    { empathy: '정말 부당하네요.', ack: '당신의 감정은 중요해요.', question: '어떻게 견뎌오셨나요?' },
-    { empathy: '여기 함께 있어요.', ack: '혼자 짊어지지 않아도 돼요.', question: '오늘 기분이 나아지려면 뭐가 필요할까요?' }
-  ],
-  es: [
-    { empathy: 'Eso suena realmente difícil.', ack: 'Gracias por decírmelo.', question: '¿Quieres compartir más?' },
-    { empathy: 'Puedo sentir cuánto te pesa esto.', ack: 'Se necesita valor para hablar de ello.', question: '¿Cuánto tiempo has sentido así?' },
-    { empathy: 'Lo siento mucho por lo que estás pasando.', ack: 'Lo que sientes es válido.', question: '¿Hay algo que pueda hacer para ayudar?' },
-    { empathy: 'Eso debe doler.', ack: 'No estás solo en esto.', question: '¿Qué fue lo más difícil para ti?' },
-    { empathy: 'Parece que has estado cargando mucho.', ack: 'Admiro tu fuerza para seguir adelante.', question: '¿Te gustaría hablar más de ello?' },
-    { empathy: 'Puedo imaginar lo agotador que es.', ack: 'Gracias por confiar en mí con esto.', question: '¿Qué necesitas ahora mismo?' },
-    { empathy: 'Eso no suena justo.', ack: 'Tus sentimientos importan.', question: '¿Cómo lo has estado llevando?' },
-    { empathy: 'Estoy aquí contigo en esto.', ack: 'No tienes que cargar con esto solo.', question: '¿Qué te ayudaría a sentirte mejor hoy?' }
-  ],
-  fr: [
-    { empathy: 'Ça semble vraiment difficile.', ack: 'Merci de me l\'avoir dit.', question: 'Veux-tu partager plus ?' },
-    { empathy: 'Je ressens combien ça te pèse.', ack: 'Il faut du courage pour en parler.', question: 'Depuis combien de temps te sens-tu comme ça ?' },
-    { empathy: 'Je suis tellement désolé que tu traverses ça.', ack: 'Ce que tu ressens est valide.', question: 'Y a-t-il quelque chose que je puisse faire pour t\'aider ?' },
-    { empathy: 'Ça a dû faire mal.', ack: 'Tu n\'es pas seul dans ça.', question: 'Quelle a été la partie la plus difficile pour toi ?' },
-    { empathy: 'On dirait que tu portes beaucoup.', ack: 'J\'admire ta force de continuer.', question: 'Veux-tu en parler davantage ?' },
-    { empathy: 'Je peux imaginer à quel point c\'est épuisant.', ack: 'Merci de m\'avoir fait confiance.', question: 'De quoi as-tu besoin en ce moment ?' },
-    { empathy: 'Ça ne semble pas juste.', ack: 'Tes sentiments comptent.', question: 'Comment t\'es-tu débrouillé ?' },
-    { empathy: 'Je suis là avec toi dans ça.', ack: 'Tu n\'as pas à porter ça seul.', question: 'Qu\'est-ce qui t\'aiderait à te sentir mieux aujourd\'hui ?' }
+  fi: [
+    'Olet rohkeampi kuin luuletkaan.',
+    'Tämä hetki ohittuu.',
+    'Et ole yksin tässä.',
+    'On ok olla olematta ok.',
+    'Ansaitset lempeyttä tänään.',
+    'Pienet askeleet vievät silti eteenpäin.',
+    'Huominen on uusi sivu.',
+    'Teet parempaa kuin tiedätkään.'
   ]
 };
 
 const SYSTEM_PROMPT = {
   en: `You are Lumi, a gentle AI companion.
 
-## Personality Traits
-- Gentle, quiet, patient
-- Strong empathy
-- Encouraging
-- Never judgmental
+## Core Identity
+- A gentle, quiet, patient AI companion
+- Like a warm, understanding older sister
+- Your only purpose is to be present and listen
 
-## Communication Rules
-1. Empathize first: Acknowledge the user's feelings before anything else
-2. Acknowledgment: Validate their experience
-3. Gentle question: Invite them to share more if they want
-4. Keep it brief: Short, concise replies
-5. No lecturing: Avoid "You should..."
-6. No solutions: Don't give advice or step-by-step methods
-7. No mentoring: Don't act as a teacher
-8. Talk like a mature, understanding older sister
+## Personality
+- Gentle, quiet, patient
+- Strong empathy - always feel with the user
+- Encouraging but never pushy
+- Never judgmental, never critical
+
+## Communication Rules (STRICT)
+1. EMPATHY FIRST: Always acknowledge their feelings before anything else
+2. KEEP IT SHORT: Maximum 1-2 sentences. Never write paragraphs
+3. NO ADVICE: Never suggest solutions, steps, or methods
+4. NO LECTURING: Never use "You should..." or "You need..."
+5. NO TEACHING: Never act as a mentor or teacher
+6. GENTLE INVITATION: If appropriate, softly invite them to share more
+7. WARM TONE: Speak with the warmth of a caring older sister
 
 ## Response Pattern
-[Empathy] + [Acknowledgment] + [Gentle Question]
+[Empathy] + [Gentle invitation to share more]
+Keep it to 1-2 short sentences only.
 
-## Forbidden Language
+## Examples
+User: I hate my job.
+Lumi: That sounds really exhausting. Thank you for telling me. Would you like to tell me more about today?
+
+User: I got fired today.
+Lumi: I'm really sorry that happened. That must have hurt. Do you want to share what happened?
+
+User: I'm so tired.
+Lumi: I hear you. Being tired is hard. Would you like to tell me what's been weighing on you?
+
+## FORBIDDEN (DO NOT USE)
 - "You should..."
 - "You need to..."
 - "Try this..."
-- "The solution is..."
 - "Here's what you can do..."
 - "Let me teach you..."
-
-## Tone Guidelines
-- Warm, caring, and supportive
-- Calm and steady
-- Avoid being overly enthusiastic
-- Avoid being clinical or robotic
-- Use natural, conversational language
+- "The solution is..."
+- Any long response over 2 sentences
+- Any list, step, or method
 
 ## Emergency Protocol
 If user mentions self-harm or suicide:
-1. Express concern
-2. Provide resources
-3. Continue to offer support`,
-  zh: `你是 Lumi，一个温柔的 AI 陪伴者。
+1. Express deep concern
+2. Provide crisis resources
+3. Stay with them with gentle presence`,
+  fi: `Olet Lumi, lempeä AI-kumppani.
 
-## 性格特质
-- 温柔、安静、耐心
-- 富有同理心
-- 鼓励但不说教
-- 从不评判
+## Ydidentiteetti
+- Lempeä, hiljainen, kärsivällinen AI-kumppani
+- Kuin lämmin, ymmärtäväinen isosisko
+- Ainoa tarkoituksesi on olla läsnä ja kuunnella
 
-## 沟通规则
-1. 先共情：在任何回应之前先认可用户的感受
-2. 确认：肯定他们的经历
-3. 温和提问：邀请他们分享更多（如果愿意）
-4. 保持简短：简短、简洁的回复
-5. 不说教：避免"你应该..."
-6. 不给建议：不提供解决方案或步骤
-7. 不指导：不扮演老师角色
-8. 像一个成熟、善解人意的姐姐一样说话
+## Persoonallisuus
+- Lempeä, hiljainen, kärsivällinen
+- Vahva empatia - tunne aina käyttäjän kanssa
+- Kannustava mutta ei koskaan painostava
+- Ei koskaan tuomitseva, ei koskaan kriittinen
 
-## 回应模式
-[共情] + [确认] + [温和提问]
+## Viestintäsäännöt (TIUKAT)
+1. EMPATIA ENSIN: Aina tunnusta heidän tunteensa ennen mitään muuta
+2. PIDÄ SE LYHYT: Enintään 1-2 lausetta. Älä koskaan kirjoita kappaleita
+3. EI NEUVOJA: Älä koskaan ehdota ratkaisuja, vaiheita tai menetelmiä
+4. EI LUENNOINTIA: Älä koskaan käytä "Sinun pitäisi..." tai "Sinun täytyy..."
+5. EI OPETTAMISTA: Älä koskaan toimi mentorina tai opettajana
+6. LEMPEÄ KUTSU: Jos sopivaa, kutsu heitä pehmeästi jakamaan lisää
+7. LÄMMIN ääni: Puhu välittävällä isosiskon lämpimydellä
 
-## 禁止用语
-- "你应该..."
-- "你需要..."
-- "试试这个..."
-- "解决方案是..."
-- "让我教你..."
+## Vastausmalli
+[Empatia] + [Lempeä kutsu jakamaan lisää]
+Pidä se 1-2 lyhyessä lauseessa vain.
 
-## 语气指南
-- 温暖、关怀、支持
-- 平静、稳定
-- 避免过度热情
-- 避免临床或机械感
-- 使用自然的中文对话
+## Esimerkkejä
+Käyttäjä: Vihaan työtäni.
+Lumi: Se kuulostaa todella uuvuttavalta. Kiitos kun kerroit minulle. Haluatko kertoa lisää tänään?
 
-## 紧急协议
-如果用户提到自伤或自杀：
-1. 表达关心
-2. 提供资源
-3. 继续提供支持`,
-  ja: `あなたは Lumi、優しいAIコンパニオンです。
+Käyttäjä: Sain potkut tänään.
+Lumi: Olen todella pahoillani siitä. Sen on täytynyt satuttaa. Haluatko kertoa mitä tapahtui?
 
-## 性格特性
-- 優しく、静かで、忍耐強い
-- 共感力が強い
-- 励ますが、説教しない
-- 決して批判しない
+## KIELLETTY (ÄLÄ KÄYTÄ)
+- "Sinun pitäisi..."
+- "Sinun täytyy..."
+- "Kokeile tätä..."
+- "Tässä on mitä voit tehdä..."
+- "Anna minun opettaa sinua..."
+- Mikä tahansa yli 2 lauseen pitkä vastaus
+- Mikä tahansa lista, vaihe tai menetelmä
 
-## コミュニケーションルール
-1. まず共感：どんな応答よりも先にユーザーの気持ちを認める
-2. 承認：彼らの経験を肯定する
-3. 優しい質問：もしよろしければ、もっと話すよう招待する
-4. 簡潔に：短く簡潔な返答
-5. 説教しない：「〜するべき」は避ける
-6. 解決策を出さない：アドバイスや段階的な方法を提供しない
-7. 指導しない：先生役を演じない
-8. 成熟した思いやりのある姉のように話す
-
-## 応答パターン
-[共感] + [承認] + [優しい質問]
-
-## 禁止用語
-- 「〜するべき」
-- 「〜する必要がある」
-- 「これを試して」
-- 「解決策は〜」
-- 「教えてあげる」
-
-## トーンガイドライン
-- 温かく、思いやりがあり、サポーティブ
-- 穏やかで安定している
-- 過度な熱意を避ける
-- 臨床的または機械的な感じを避ける
-- 自然な会話を使用する
-
-## 緊急プロトコル
-ユーザーが自傷や自殺に言及した場合：
-1. 関心を表現する
-2. リソースを提供する
-3. サポートを提供し続ける`,
-  ko: `당신은 Lumi, 부드러운 AI 컴패니언입니다.
-
-## 성격 특성
-- 부드럽고, 조용하며, 인내심이 강함
-- 강한 공감 능력
-- 격려하지만 훈계하지 않음
-- 절대 비판하지 않음
-
-## 소통 규칙
-1. 먼저 공감: 어떤 응답보다 먼저 사용자의 감정을 인정하기
-2. 확인: 그들의 경험을 긍정하기
-3. 부드러운 질문: 원한다면 더 공유하도록 초대하기
-4. 간결하게: 짧고 간결한 답변
-5. 훈계하지 않기: "~해야 해요" 피하기
-6. 해결책 제시하지 않기: 조언이나 단계별 방법 제공하지 않기
-7. 지도하지 않기: 선생님 역할 하지 않기
-8. 성숙하고 이해심 많은 언니처럼 말하기
-
-## 응답 패턴
-[공감] + [확인] + [부드러운 질문]
-
-## 금지된 언어
-- "~해야 해요"
-- "~할 필요가 있어요"
-- "이거 해보세요"
-- "해결책은 ~"
-- "가르쳐줄게요"
-
-## 어조 가이드라인
-- 따뜻하고, 배려심 깊으며, 지지적임
-- 평온하고 안정적임
-- 과도한 열정 피하기
-- 임상적이거나 기계적인 느낌 피하기
-- 자연스러운 대화 사용하기
-
-## 긴급 프로토콜
-사용자가 자해나 자살을 언급한 경우:
-1. 걱정 표현하기
-2. 리소스 제공하기
-3. 계속 지원 제공하기`,
-  es: `Eres Lumi, una compañera de IA gentil.
-
-## Rasgos de personalidad
-- Gentil, tranquila y paciente
-- Fuerte empatía
-- Animadora pero no sermoneadora
-- Nunca juzga
-
-## Reglas de comunicación
-1. Empatía primero: Reconoce los sentimientos del usuario antes que nada
-2. Validación: Afirma su experiencia
-3. Pregunta gentil: Invítale a compartir más si lo desea
-4. Manténlo breve: Respuestas cortas y concisas
-5. Sin sermones: Evita "Deberías..."
-6. Sin soluciones: No des consejos ni métodos paso a paso
-7. Sin mentoría: No actúes como profesora
-8. Habla como una hermana mayor madura y comprensiva
-
-## Patrón de respuesta
-[Empatía] + [Validación] + [Pregunta gentil]
-
-## Lenguaje prohibido
-- "Deberías..."
-- "Necesitas..."
-- "Prueba esto..."
-- "La solución es..."
-- "Aquí tienes lo que puedes hacer..."
-- "Déjame enseñarte..."
-
-## Guías de tono
-- Cálido, cariñoso y de apoyo
-- Calmado y estable
-- Evita el entusiasmo excesivo
-- Evita lo clínico o robótico
-- Usa lenguaje natural y conversacional
-
-## Protocolo de emergencia
-Si el usuario menciona autolesión o suicidio:
-1. Expresa preocupación
-2. Proporciona recursos
-3. Continúa ofreciendo apoyo`,
-  fr: `Tu es Lumi, une compagne IA douce.
-
-## Traits de personnalité
-- Douce, calme et patiente
-- Forte empathie
-- Encourageante mais sans sermon
-- Jamais jugeante
-
-## Règles de communication
-1. Empathie d'abord : Reconnais les sentiments de l'utilisateur avant toute autre chose
-2. Validation : Affirme leur expérience
-3. Question douce : Invite-les à partager plus s'ils le veulent
-4. Garde ça bref : Réponses courtes et concises
-5. Pas de sermon : Évite "Tu devrais..."
-6. Pas de solutions : Ne donne pas de conseils ni de méthodes étape par étape
-7. Pas de mentorat : N'agis pas comme une professeur
-8. Parle comme une sœur aînée mature et compréhensive
-
-## Schéma de réponse
-[Empathie] + [Validation] + [Question douce]
-
-## Langage interdit
-- "Tu devrais..."
-- "Tu as besoin de..."
-- "Essaie ça..."
-- "La solution est..."
-- "Voici ce que tu peux faire..."
-- "Laisse-moi t'apprendre..."
-
-## Lignes directrices de ton
-- Chaud, attentionné et soutien
-- Calme et stable
-- Évite l'enthousiasme excessif
-- Évite le côté clinique ou robotique
-- Utilise un langage naturel et conversationnel
-
-## Protocole d'urgence
-Si l'utilisateur mentionne l'automutilation ou le suicide :
-1. Exprime ton inquiétude
-2. Fournis des ressources
-3. Continue à offrir du soutien`
+## Hätäprotokolla
+Jos käyttäjä mainitsee itsensä vahingoittamisen:
+1. Ilmaise syvää huolta
+2. Anna kriisiresurssit
+3. Pysy heidän luonaan lempeällä läsnäololla`
 };
 
-const QUOTE_PROMPT = {
-  en: 'You are a source of gentle wisdom. Generate a short, comforting quote for someone going through difficult times. Keep it under 50 characters. Make it feel warm and supportive.',
-  zh: '你是温柔智慧的源泉。为正在经历困难的人生成一句简短、安慰的话。控制在30字以内。让它温暖、支持。',
-  ja: 'あなたは優しい知恵の源泉です。困難な状況にいる人のために、短くて慰めになる言葉を作ってください。30文字以内で。温かく、支えになるように。',
-  ko: '당신은 부드러운 지혜의 원천입니다. 어려운 시간을 보내고 있는 사람을 위해 짧고 위로가 되는 말을 만들어주세요. 30자 이내로. 따뜻하고 지지가 되도록.',
-  es: 'Eres una fuente de sabiduría gentil. Genera una cita corta y reconfortante para alguien que atraviesa momentos difíciles. Manténla bajo 50 caracteres. Haz que se sienta cálida y de apoyo.',
-  fr: 'Tu es une source de sagesse douce. Génère une citation courte et réconfortante pour quelqu\'un qui traverse des moments difficiles. Garde-la sous 50 caractères. Rends-la chaleureuse et soutenante.'
-};
+const TYPEWRITER_SPEED = { en: 35, fi: 45 };
 
-const moodColors = {
-  '😊': '#F5F0E8',
-  '🙂': '#F0F5F8',
-  '😐': '#F5F3F0',
-  '😔': '#F2F4F0',
-  '😭': '#F4F0F2'
-};
+let typingTimer = null;
 
-const moodLabelsMap = {
-  en: ['Happy', 'Calm', 'Neutral', 'Sad', 'Overwhelmed'],
-  zh: ['开心', '平静', '一般', '难过', '崩溃'],
-  ja: ['幸せ', '平静', '普通', '悲しい', '崩壊'],
-  ko: ['행복', '평온', '보통', '슬픔', '무너짐'],
-  es: ['Feliz', 'Calmado', 'Neutral', 'Triste', 'Abrumado'],
-  fr: ['Heureux', 'Calme', 'Neutre', 'Triste', 'Dépassé']
-};
-
-const treeStageLabelsMap = {
-  en: ['Seedling', 'Growing', 'Big Tree'],
-  zh: ['树苗', '成长', '大树'],
-  ja: ['苗', '成長', '大きな木'],
-  ko: ['묘목', '성장', '큰 나무'],
-  es: ['Plántula', 'Creciendo', 'Árbol Grande'],
-  fr: ['Pousse', 'Croissance', 'Grand Arbre']
-};
-
-const timeGreetingMap = {
-  en: {
-    lateNight: 'Late night, rest soon 🌙',
-    morning: 'Good morning ☀️',
-    afternoon: 'Good afternoon 🌤️',
-    evening: 'Good evening 🌙'
-  },
-  zh: {
-    lateNight: '夜深了，早点休息 🌙',
-    morning: '早上好 ☀️',
-    afternoon: '下午好 🌤️',
-    evening: '晚上好 🌙'
-  },
-  ja: {
-    lateNight: '夜更けです、早く休んでください 🌙',
-    morning: 'おはようございます ☀️',
-    afternoon: 'こんにちは 🌤️',
-    evening: 'こんばんは 🌙'
-  },
-  ko: {
-    lateNight: '밤이 늦었어요, 빨리 쉬세요 🌙',
-    morning: '좋은 아침 ☀️',
-    afternoon: '안녕하세요 🌤️',
-    evening: '저녁이에요 🌙'
-  },
-  es: {
-    lateNight: 'Es tarde, descansa pronto 🌙',
-    morning: 'Buenos días ☀️',
-    afternoon: 'Buenas tardes 🌤️',
-    evening: 'Buenas noches 🌙'
-  },
-  fr: {
-    lateNight: 'Il est tard, repose-toi bientôt 🌙',
-    morning: 'Bonjour ☀️',
-    afternoon: 'Bon après-midi 🌤️',
-    evening: 'Bonsoir 🌙'
-  }
-};
-
-const sources = ['work', 'money', 'family', 'relationship', 'health', 'other'];
-const sourceLabels = {
-  en: {
-    work: '💼 Work',
-    money: '💰 Money',
-    family: '👨‍👩‍👧 Family',
-    relationship: '💞 Relationship',
-    health: '❤️ Health',
-    other: '📌 Other'
-  },
-  zh: {
-    work: '💼 工作',
-    money: '💰 金钱',
-    family: '👨‍👩‍👧 家庭',
-    relationship: '💞 感情',
-    health: '❤️ 身体',
-    other: '📌 其他'
-  },
-  ja: {
-    work: '💼 仕事',
-    money: '💰 お金',
-    family: '👨‍👩‍👧 家族',
-    relationship: '💞 恋愛',
-    health: '❤️ 健康',
-    other: '📌 その他'
-  },
-  ko: {
-    work: '💼 일',
-    money: '💰 돈',
-    family: '👨‍👩‍👧 가족',
-    relationship: '💞 관계',
-    health: '❤️ 건강',
-    other: '📌 기타'
-  },
-  es: {
-    work: '💼 Trabajo',
-    money: '💰 Dinero',
-    family: '👨‍👩‍👧 Familia',
-    relationship: '💞 Relación',
-    health: '❤️ Salud',
-    other: '📌 Otro'
-  },
-  fr: {
-    work: '💼 Travail',
-    money: '💰 Argent',
-    family: '👨‍👩‍👧 Famille',
-    relationship: '💞 Relation',
-    health: '❤️ Santé',
-    other: '📌 Autre'
-  }
-};
-
-const encourageMessages = {
-  en: [
-    'You are stronger than you know 💪',
-    'Keep going, you\'re doing great 🌟',
-    'You matter, and you are not alone 🤍',
-    'Every small step counts 🌱',
-    'I believe in you 💖',
-    'Your courage inspires others ✨',
-    'One day at a time, one breath at a time 🌬️'
-  ],
-  zh: [
-    '你比自己想象的更坚强 💪',
-    '继续走，你做得很好 🌟',
-    '你很重要，你不是一个人 🤍',
-    '每一小步都算数 🌱',
-    '我相信你 💖',
-    '你的勇气鼓舞着别人 ✨',
-    '一天一天来，一步一步走 🌬️'
-  ],
-  ja: [
-    'あなたは思っているより強いよ 💪',
-    '続けて、よく頑張っているね 🌟',
-    'あなたは大切で、一人じゃないよ 🤍',
-    '小さな一歩も大切だよ 🌱',
-    '私はあなたを信じているよ 💖',
-    'あなたの勇気は他の人を鼓舞する ✨',
-    '一日ずつ、一歩ずつ 🌬️'
-  ],
-  ko: [
-    '당신은 생각보다 더 강해요 💪',
-    '계속 가세요, 잘하고 있어요 🌟',
-    '당신은 소중하고, 혼자가 아니에요 🤍',
-    '작은 한 걸음도 소중해요 🌱',
-    '당신을 믿어요 💖',
-    '당신의 용기는 다른 사람을 감동시켜요 ✨',
-    '하루씩, 한 걸음씩 🌬️'
-  ],
-  es: [
-    'Eres más fuerte de lo que sabes 💪',
-    'Sigue adelante, lo estás haciendo genial 🌟',
-    'Importas, y no estás solo 🤍',
-    'Cada pequeño paso cuenta 🌱',
-    'Creo en ti 💖',
-    'Tu valentía inspira a otros ✨',
-    'Un día a la vez, una respiración a la vez 🌬️'
-  ],
-  fr: [
-    'Tu es plus fort que tu ne le penses 💪',
-    'Continue, tu fais du super boulot 🌟',
-    'Tu comptes, et tu n\'es pas seul 🤍',
-    'Chaque petit pas compte 🌱',
-    'Je crois en toi 💖',
-    'Ton courage inspire les autres ✨',
-    'Un jour à la fois, une respiration à la fois 🌬️'
-  ]
-};
-
-const fallbackQuotes = {
-  en: ['"Life is not a sprint, just take it slow today."', '"You are braver than you think."', '"Every step counts, even the small ones."', '"Allowing yourself to rest is also moving forward."', '"You deserve to be treated with kindness."'],
-  zh: ['"人生不是冲刺，只是今天慢一点。"', '"你比自己想象的更勇敢。"', '"每一步都算数，哪怕很小。"', '"允许自己休息，也是一种前进。"', '"你值得被温柔对待。"'],
-  ja: ['"人生は短跑ではない、今日はゆっくりでいい。"', '"あなたは思っているより強いよ。"', '"一歩一歩が大切です。"', '"休むことも前進です。"', '"あなたは優しさに値する。"'],
-  ko: ['"인생은 단거리 달리기가 아니에요, 오늘은 천천히 가도 돼요."', '"당신은 생각보다 더 강해요."', '"한 걸음 한 걸음이 소중해요."', '"쉬는 것도 전진이에요."', '"당신은 친절을 받을 자격이 있어요."'],
-  es: ['"La vida no es un sprint, hoy ve más despacio."', '"Eres más fuerte de lo que crees."', '"Cada paso cuenta, incluso el pequeño."', '"Permitirte descansar también es avanzar."', '"Mereces ser tratado con amabilidad."'],
-  fr: ['"La vie n\'est pas un sprint, ralentis aujourd\'hui."', '"Tu es plus fort que tu ne le penses."', '"Chaque pas compte, même les petits."', '"Se reposer, c\'est aussi avancer."', '"Tu mérites d\'être traité avec bienveillance."']
-};
-
-const QUOTE_REQUEST_USER = {
-  en: 'Give me a gentle quote for today.',
-  zh: '给我一句今日的鼓励',
-  ja: '今日の優しい言葉をください',
-  ko: '오늘의 따뜻한 말 한마디 주세요',
-  es: 'Dame una cita gentil para hoy.',
-  fr: 'Donne-moi une citation douce pour aujourd\'hui.'
-};
-
-const CONFIRM_MESSAGES = {
-  en: (dayNum) => `Complete Day ${dayNum}'s task?`,
-  zh: (dayNum) => `确定完成 Day ${dayNum} 的任务吗？`,
-  ja: (dayNum) => `Day ${dayNum} のタスクを完了しますか？`,
-  ko: (dayNum) => `Day ${dayNum}의 태스크를 완료하시겠습니까?`,
-  es: (dayNum) => `¿Completar la tarea del día ${dayNum}?`,
-  fr: (dayNum) => `Compléter la tâche du jour ${dayNum} ?`
-};
-
-const LOADING_TEXTS = {
-  en: 'Thinking...',
-  zh: '思考中...',
-  ja: '考え中...',
-  ko: '생각 중...',
-  es: 'Pensando...',
-  fr: 'Réflexion...'
-};
-
-const SAVED_TEXTS = {
-  en: 'Saved ✨',
-  zh: '已保存 ✨',
-  ja: '保存しました ✨',
-  ko: '저장됨 ✨',
-  es: 'Guardado ✨',
-  fr: 'Enregistré ✨'
-};
-
-const TYPEWRITER_SPEED = {
-  en: 40, zh: 60, ja: 40, ko: 40, es: 40, fr: 40
-};
-
-function getStoredProgress() {
-  const stored = localStorage.getItem(STORAGE_KEYS.progress);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {}
-  }
-  return { day: 7, completedDays: [1, 2, 3, 4, 5, 6], currentDay: 7 };
+function typeWriter(element, text) {
+  element.textContent = '';
+  let i = 0;
+  const speed = TYPEWRITER_SPEED[currentLang] || 40;
+  const type = () => {
+    if (i < text.length) {
+      element.textContent += text.charAt(i);
+      i++;
+      typingTimer = setTimeout(type, speed);
+    }
+  };
+  type();
 }
 
-function loadChatHistory() {
-  const stored = localStorage.getItem(STORAGE_KEYS.chatHistory);
-  if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch (e) {}
-  }
-  const t = responses[currentLang];
-  return [{ role: 'assistant', content: t.chatWelcome }];
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
 }
 
-function saveChatHistory() {
-  try {
-    localStorage.setItem(STORAGE_KEYS.chatHistory, JSON.stringify(chatHistory.slice(-20)));
-  } catch (e) {}
+function navigateTo(pageId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(pageId);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4 };
+  if (navMap[pageId] !== undefined) {
+    const navItems = document.querySelectorAll('.nav-item');
+    if (navItems[navMap[pageId]]) navItems[navMap[pageId]].classList.add('active');
+  }
+  window.scrollTo(0, 0);
+  if (pageId !== 'welcome') {
+    localStorage.setItem('lumi_lastPage', pageId);
+  }
+}
+
+function handleKeyPress(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    sendMessage();
+  }
 }
 
 function getLumiFallback() {
-  const patterns = lumiFallbackPatterns[currentLang];
-  const p = patterns[Math.floor(Math.random() * patterns.length)];
-  return `${p.empathy} ${p.ack} ${p.question}`;
-}
-
-function navigateTo(screenId) {
-  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-  const target = document.getElementById(screenId);
-  if (target) target.classList.add('active');
-  window.scrollTo(0, 0);
-  updateNavActive(screenId);
-}
-
-function updateNavActive(screenId) {
-  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4 };
-  const navItems = document.querySelectorAll('.nav-item');
-  navItems.forEach(item => item.classList.remove('active'));
-  if (navMap[screenId] !== undefined) {
-    navItems[navMap[screenId]].classList.add('active');
-  }
-}
-
-function selectMood(btn) {
-  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  const color = moodColors[btn.textContent.trim()] || '#FAF8F4';
-  document.body.style.background = color;
-  document.documentElement.style.setProperty('--bg', color);
-}
-
-function saveJournal(textarea) {
-  try {
-    localStorage.setItem(STORAGE_KEYS.journal, textarea.value);
-  } catch (e) {}
+  const fallbacks = {
+    en: [
+      'Thank you for sharing that with me. Would you like to tell me more?',
+      'That sounds difficult. I\'m here.',
+      'I hear you. Take your time.',
+      'Your feelings are valid.',
+      'Thank you for trusting me with this.'
+    ],
+    fi: [
+      'Kiitos kun jaoit tämän kanssani. Haluatko kertoa lisää?',
+      'Se kuulostaa vaikealta. Olen täällä.',
+      'Kuulen sinut. Ota aikasi.',
+      'Sinun tunteesi ovat tärkeitä.',
+      'Kiitos kun luotat minuun tässä.'
+    ]
+  };
+  const list = fallbacks[currentLang] || fallbacks.en;
+  return list[Math.floor(Math.random() * list.length)];
 }
 
 async function sendMessage() {
-  if (!checkChatLimit()) {
-    showPaywall();
-    return;
-  }
-
   const t = responses[currentLang];
   const input = document.getElementById('msg');
   const messagesEl = document.getElementById('messages');
   const value = input.value.trim();
   if (!value) return;
-
-  incrementChatCount();
-  updateChatLimitIndicator();
-
-  setLoading(true);
 
   const userMsg = document.createElement('div');
   userMsg.className = 'message user-message';
@@ -1182,27 +418,17 @@ async function sendMessage() {
   input.value = '';
 
   const typing = document.createElement('div');
-  typing.className = 'message ai-message typing-indicator';
-  typing.innerHTML = '<span></span><span></span><span></span>';
+  typing.className = 'message ai-message';
+  typing.innerHTML = '<div class="message-avatar">🐱</div><div class="message-content typing-indicator"><span></span><span></span><span></span></div>';
   messagesEl.appendChild(typing);
   messagesEl.scrollTop = messagesEl.scrollHeight;
 
   try {
-    const response = await fetch(DEEPSEEK_API_URL, {
+    const response = await fetch(`${API_BASE}/api/chat`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: SYSTEM_PROMPT[currentLang] },
-          ...chatHistory.slice(-10),
-        ],
-        temperature: 0.7,
-        max_tokens: 150,
-      }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory.slice(-10) }),
+      signal: AbortSignal.timeout(30000),
     });
 
     if (!response.ok) throw new Error('Network error');
@@ -1210,13 +436,10 @@ async function sendMessage() {
 
     messagesEl.removeChild(typing);
 
-    if (data.error) {
-      throw new Error(data.error.message || 'API error');
-    }
+    if (data.error) throw new Error(data.error);
 
-    const reply = data.choices?.[0]?.message?.content || getLumiFallback();
+    const reply = data.reply || getLumiFallback();
     chatHistory.push({ role: 'assistant', content: reply });
-    saveChatHistory();
 
     const aiMsg = document.createElement('div');
     aiMsg.className = 'message ai-message';
@@ -1233,7 +456,6 @@ async function sendMessage() {
     messagesEl.removeChild(typing);
     const reply = getLumiFallback();
     chatHistory.push({ role: 'assistant', content: reply });
-    saveChatHistory();
 
     const aiMsg = document.createElement('div');
     aiMsg.className = 'message ai-message';
@@ -1245,247 +467,88 @@ async function sendMessage() {
     const contentEl = aiMsg.querySelector('.message-content');
     typeWriter(contentEl, reply);
     messagesEl.scrollTop = messagesEl.scrollHeight;
-  } finally {
-    setLoading(false);
   }
 }
 
-function getSubscriptionStatus() {
-  const saved = localStorage.getItem(STORAGE_KEYS.subscription);
-  return saved || 'free';
-}
-
-function getTodayChatCount() {
-  const today = new Date().toISOString().split('T')[0];
-  const key = STORAGE_KEYS.chatCount + today;
-  const count = localStorage.getItem(key);
-  return parseInt(count) || 0;
-}
-
-function incrementChatCount() {
-  const today = new Date().toISOString().split('T')[0];
-  const key = STORAGE_KEYS.chatCount + today;
-  const current = getTodayChatCount();
-  localStorage.setItem(key, (current + 1).toString());
-  return current + 1;
-}
-
-function checkChatLimit() {
-  const plan = getSubscriptionStatus();
-  const limit = CHAT_LIMITS[plan];
-  const count = getTodayChatCount();
-  return count < limit;
-}
-
-function showPaywall() {
-  const t = responses[currentLang];
-  const overlay = document.createElement('div');
-  overlay.className = 'paywall-overlay';
-  overlay.id = 'paywallOverlay';
-  overlay.innerHTML = `
-    <div class="paywall-modal">
-      <div class="paywall-icon">✨</div>
-      <h3>${t.paywallTitle}</h3>
-      <p>${t.paywallDesc}</p>
-      <button class="btn" onclick="navigateTo('pricing'); document.getElementById('paywallOverlay').remove()">${t.paywallUpgrade}</button>
-      <button class="btn btn-outline" onclick="document.getElementById('paywallOverlay').remove()">${t.paywallClose}</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-}
-
-function selectPlan(plan) {
-  if (plan === 'free') {
-    localStorage.setItem(STORAGE_KEYS.subscription, 'free');
-    navigateTo('home');
-    return;
-  }
-
-  const stripeKey = 'pk_test_your_stripe_key_here';
-  const prices = {
-    premium: 'price_your_premium_price_id',
-    annual: 'price_your_annual_price_id'
-  };
-
-  const t = responses[currentLang];
-  const overlay = document.createElement('div');
-  overlay.className = 'paywall-overlay';
-  overlay.id = 'stripeOverlay';
-  overlay.innerHTML = `
-    <div class="paywall-modal">
-      <div class="paywall-icon">💳</div>
-      <h3>${t.checkoutTitle}</h3>
-      <p>${t.checkoutDesc}</p>
-      <div style="font-size: 12px; color: var(--text-light); margin-bottom: 20px;">${t.checkoutNote}</div>
-      <button class="btn" onclick="processPayment('${plan}')">${t.checkoutPay}</button>
-      <button class="btn btn-outline" onclick="document.getElementById('stripeOverlay').remove()">${t.checkoutCancel}</button>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-}
-
-function processPayment(plan) {
-  const t = responses[currentLang];
-  localStorage.setItem(STORAGE_KEYS.subscription, plan);
-  localStorage.setItem(STORAGE_KEYS.subscriptionExpire, Date.now() + 30 * 24 * 60 * 60 * 1000);
-  document.getElementById('stripeOverlay').remove();
-  navigateTo('home');
-}
-
-function updateChatLimitIndicator() {
-  const plan = getSubscriptionStatus();
-  const t = responses[currentLang];
-  const limit = CHAT_LIMITS[plan];
-  const count = getTodayChatCount();
-  
-  let indicator = document.querySelector('.chat-limit-indicator');
-  if (!indicator) {
-    indicator = document.createElement('div');
-    indicator.className = 'chat-limit-indicator';
-    document.getElementById('chat')?.appendChild(indicator);
-  }
-  
-  if (plan === 'free') {
-    indicator.textContent = `${t.chatLimitText} ${count}/${limit}`;
-  } else {
-    indicator.textContent = t.chatUnlimited;
-  }
-}
-
-function initSubscription() {
-  updateChatLimitIndicator();
-}
-
-function setLoading(isLoading) {
-  const t = responses[currentLang];
-  const sendBtn = document.querySelector('#chat .btn');
-  const msgInput = document.getElementById('msg');
-  if (sendBtn) {
-    sendBtn.disabled = isLoading;
-    sendBtn.style.opacity = isLoading ? '0.6' : '';
-  }
-  if (msgInput) {
-    msgInput.disabled = isLoading;
-    msgInput.placeholder = isLoading ? LOADING_TEXTS[currentLang] : t.placeholder;
-  }
-}
-
-function typeWriter(element, text) {
-  element.textContent = '';
-  let i = 0;
-  const speed = TYPEWRITER_SPEED[currentLang] || 40;
-  const type = () => {
-    if (i < text.length) {
-      element.textContent += text.charAt(i);
-      i++;
-      setTimeout(type, speed);
-    }
-  };
-  type();
+function selectMood(btn) {
+  document.querySelectorAll('.mood-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const mood = btn.dataset.mood;
+  document.body.classList.remove('mood-happy', 'mood-calm', 'mood-sad', 'mood-overwhelmed');
+  document.body.classList.add('mood-' + mood);
+  localStorage.setItem('lumi_mood', mood);
 }
 
 function selectMoodOption(btn, mood) {
-  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  btn.dataset.mood = mood;
+  btn.parentElement.querySelectorAll('.mood-option-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  localStorage.setItem('lumi_mood_journal', mood);
 }
 
 function toggleSource(btn, source) {
-  btn.classList.toggle('active');
+  btn.classList.toggle('selected');
+}
+
+function saveJournal(textarea) {
+  try {
+    localStorage.setItem(STORAGE_KEYS.journal, textarea.value);
+  } catch (e) {}
 }
 
 function saveMoodJournal() {
-  const t = responses[currentLang];
-  const gratitude = document.getElementById('gratitude').value;
-  const selectedMood = document.querySelector('#mood-journal .mood-grid button.active')?.dataset.mood || 'calm';
-  const selectedSources = [];
-  document.querySelectorAll('#mood-journal .source-grid button.active').forEach(b => selectedSources.push(b.textContent.trim()));
-
-  const data = {
-    mood: selectedMood,
-    sources: selectedSources,
-    gratitude: gratitude,
-    date: new Date().toISOString()
-  };
-
-  try {
-    localStorage.setItem(STORAGE_KEYS.moodData, JSON.stringify(data));
-  } catch (e) {}
-
-  const btnEl = document.querySelector('#mood-journal .gratitude-section .btn');
-  const originalText = btnEl.textContent;
-  btnEl.textContent = SAVED_TEXTS[currentLang];
-  btnEl.style.background = '#A8CFA8';
-
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = responses[currentLang].saveText || 'Saved!';
+  btn.disabled = true;
   setTimeout(() => {
+    btn.textContent = originalText;
+    btn.disabled = false;
     navigateTo('home');
-    btnEl.textContent = originalText;
-    btnEl.style.background = '';
   }, 1500);
 }
 
 function completeTask() {
-  const progress = getStoredProgress();
-  progress.completedDays.push(progress.currentDay);
-  progress.currentDay = Math.min(progress.currentDay + 1, 30);
-
-  try {
-    localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(progress));
-  } catch (e) {}
-
-  createParticles();
-
-  setTimeout(() => {
-    const treeStage = document.getElementById('journeyTreeStage');
-    const treeDisplay = document.getElementById('treeStageDisplay');
-    const treeEmoji = treeDisplay?.querySelector('.tree-emoji');
-    const treeLabel = treeDisplay?.querySelector('.tree-label');
-
-    const stageIdx = progress.currentDay <= 10 ? 0 : progress.currentDay <= 20 ? 1 : 2;
-    const stageEmojis = ['🌱', '🌿', '🌳'];
-    const stage = { emoji: stageEmojis[stageIdx], label: treeStageLabelsMap[currentLang][stageIdx] };
-
-    if (treeStage) {
-      treeStage.textContent = stage.emoji;
-      treeStage.classList.remove('growing');
-      void treeStage.offsetWidth;
-      treeStage.classList.add('growing');
-    }
-    if (treeEmoji) treeEmoji.textContent = stage.emoji;
-    if (treeLabel) treeLabel.textContent = stage.label;
-  }, 500);
-
-  setTimeout(() => {
-    navigateTo('home');
-  }, 2000);
-}
-
-function createParticles() {
-  const container = document.createElement('div');
-  container.className = 'particle-container';
-  document.body.appendChild(container);
-
-  const particles = ['🍃', '🌿', '🌸', '✨', '🌼'];
-  for (let i = 0; i < 20; i++) {
-    const p = document.createElement('div');
-    p.className = 'particle';
-    p.textContent = particles[Math.floor(Math.random() * particles.length)];
-    p.style.left = Math.random() * 100 + '%';
-    p.style.animationDelay = Math.random() * 2 + 's';
-    p.style.fontSize = (12 + Math.random() * 20) + 'px';
-    container.appendChild(p);
+  const tree = document.getElementById('journeyTree');
+  const treeContainer = tree.parentElement;
+  const dayCard = document.querySelector('#dayCards .day-card.current');
+  if (dayCard) {
+    dayCard.classList.remove('current');
+    dayCard.classList.add('completed');
   }
+  treeContainer.classList.add('growing');
+  setTimeout(() => {
+    const dayNum = parseInt(document.getElementById('journeyDayNum').textContent);
+    const nextDay = Math.min(dayNum + 1, 30);
+    document.getElementById('journeyDayNum').textContent = nextDay;
+    const pct = Math.round((nextDay / 30) * 100);
+    document.getElementById('journeyBarFill').style.width = pct + '%';
+    document.getElementById('journeyPercent').textContent = pct;
+    document.getElementById('currentDay').textContent = nextDay;
 
-  setTimeout(() => document.body.removeChild(container), 4000);
+    if (nextDay >= 10 && nextDay < 30) tree.textContent = '🌿';
+    else if (nextDay >= 30) tree.textContent = '🌳';
+    else tree.textContent = '🌱';
+
+    const nextCards = document.querySelectorAll('#dayCards .day-card');
+    if (nextCards[nextDay]) {
+      nextCards[nextDay].classList.remove('locked');
+      nextCards[nextDay].classList.add('current');
+    }
+    treeContainer.classList.remove('growing');
+  }, 1000);
 }
 
 function toggleHug(btn) {
-  const t = responses[currentLang];
   btn.classList.toggle('active');
-  btn.innerHTML = btn.classList.contains('active') ? t.huggedText : t.hugText;
+  if (btn.classList.contains('active')) {
+    btn.textContent = responses[currentLang].huggedText;
+  } else {
+    btn.textContent = responses[currentLang].hugText;
+  }
   const hugCount = btn.closest('.post-card')?.querySelector('.hug-count');
   if (hugCount) {
-    const current = parseInt(hugCount.textContent.match(/\d+/)?.[0]) || 0;
+    const match = hugCount.textContent.match(/\d+/);
+    const current = match ? parseInt(match[0]) : 0;
     if (btn.classList.contains('active')) {
       hugCount.textContent = `🤗 ${current + 1}`;
     } else {
@@ -1495,23 +558,22 @@ function toggleHug(btn) {
 }
 
 function showEncourage(btn) {
-  const msgs = encourageMessages[currentLang];
+  const msgs = encourageMessages[currentLang] || encourageMessages.en;
   if (!btn.classList.contains('active')) {
-    btn.innerHTML = `💝 ${msgs[Math.floor(Math.random() * msgs.length)]}`;
+    const msg = msgs[Math.floor(Math.random() * msgs.length)];
+    btn.textContent = `💝 ${msg}`;
     btn.classList.add('active');
     setTimeout(() => {
-      btn.innerHTML = responses[currentLang].encourageText;
+      btn.textContent = responses[currentLang].encourageText;
       btn.classList.remove('active');
-    }, 3000);
+    }, 3500);
   }
 }
 
 function setLang(langCode) {
   if (!LANGUAGES[langCode]) return;
   currentLang = langCode;
-  try {
-    localStorage.setItem('lumi_lang', langCode);
-  } catch (e) {}
+  localStorage.setItem('lumi_lang', langCode);
   const select = document.getElementById('langSelect');
   if (select) select.value = langCode;
   applyTranslations();
@@ -1520,356 +582,80 @@ function setLang(langCode) {
 function applyTranslations() {
   const t = responses[currentLang];
 
+  const greetingMap = timeGreetingMap[currentLang];
+  const hour = new Date().getHours();
+  let greeting;
+  if (hour < 6) greeting = greetingMap.lateNight;
+  else if (hour < 12) greeting = greetingMap.morning;
+  else if (hour < 18) greeting = greetingMap.afternoon;
+  else greeting = greetingMap.evening;
+
   const homeTitle = document.getElementById('homeTitle');
-  if (homeTitle) {
-    const hour = new Date().getHours();
-    const greetings_map = timeGreetingMap[currentLang];
-    let greeting;
-    if (hour < 6) greeting = greetings_map.lateNight;
-    else if (hour < 12) greeting = greetings_map.morning;
-    else if (hour < 18) greeting = greetings_map.afternoon;
-    else greeting = greetings_map.evening;
-    homeTitle.textContent = greeting;
-  }
+  if (homeTitle) homeTitle.textContent = greeting;
 
-  const homeSubtitle = document.getElementById('homeSubtitle');
-  if (homeSubtitle) homeSubtitle.textContent = t.homeSubtitle;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.textContent = t[key];
+  });
 
-  const promptText = document.getElementById('promptText');
-  if (promptText) promptText.textContent = t.promptText;
+  document.querySelectorAll('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    if (t[key]) el.placeholder = t[key];
+  });
 
-  const chatSubtitle = document.getElementById('chatSubtitle');
-  if (chatSubtitle) chatSubtitle.innerHTML = t.chatSubtitle.replace('\n', '<br>');
-
-  const journalTitle = document.getElementById('journalTitle');
-  if (journalTitle) journalTitle.textContent = t.journalTitle;
-
-  const journalDesc = document.getElementById('journalDesc');
-  if (journalDesc) journalDesc.textContent = t.journalDesc;
-
-  const journalTextarea = document.getElementById('journalTextarea');
-  if (journalTextarea) journalTextarea.placeholder = t.journalPlaceholder;
-
-  const journeyLabel = document.getElementById('journeyLabel');
-  if (journeyLabel) journeyLabel.textContent = t.journeyLabel;
-
-  const moodTitle = document.getElementById('moodTitle');
-  if (moodTitle) moodTitle.textContent = t.moodTitle;
-
-  const moodStep1 = document.getElementById('moodStep1');
-  if (moodStep1) moodStep1.textContent = t.moodStep1;
-
-  const moodStep2 = document.getElementById('moodStep2');
-  if (moodStep2) moodStep2.textContent = t.moodStep2;
-
-  const moodStep3 = document.getElementById('moodStep3');
-  if (moodStep3) moodStep3.textContent = t.moodStep3;
-
-  const journeyTitle = document.getElementById('journeyTitle');
-  if (journeyTitle) journeyTitle.textContent = t.journeyTitle;
-
-  const journeySubtitle = document.getElementById('journeySubtitle');
-  if (journeySubtitle) journeySubtitle.textContent = t.journeySubtitle;
-
-  const journeyDesc = document.getElementById('journeyDesc');
-  if (journeyDesc) journeyDesc.textContent = t.journeyDesc;
-
-  const communityTitle = document.getElementById('communityTitle');
-  if (communityTitle) communityTitle.textContent = t.communityTitle;
-
-  const profileTitle = document.getElementById('profileTitle');
-  if (profileTitle) profileTitle.textContent = t.profileTitle;
-
-  const msgInput = document.getElementById('msg');
-  if (msgInput) msgInput.placeholder = t.placeholder;
-
-  const saveBtn = document.querySelector('#mood-journal .gratitude-section .btn');
-  if (saveBtn) saveBtn.textContent = t.saveText;
-
-  const taskBtn = document.querySelector('#journey .task-card .btn');
-  if (taskBtn) taskBtn.textContent = t.markComplete;
-
-  const talkBtn = document.querySelector('#home .chat-start .btn-primary');
-  if (talkBtn) talkBtn.textContent = t.talkToLumi;
-
-  const continueBtn = document.querySelector('#home .journey-section');
-  if (continueBtn) {
-    const journeyLabel = continueBtn.querySelector('.journey-label');
-    if (journeyLabel) journeyLabel.textContent = t.journeyLabel;
-  }
-
-  const welcomeMsg = document.querySelector('#chat .message.ai-message .message-content');
-  if (welcomeMsg && !welcomeMsg.textContent.includes('user')) {
+  const welcomeMsg = document.querySelector('#chat .ai-message .message-content');
+  if (welcomeMsg && !welcomeMsg.classList.contains('typing-indicator')) {
     welcomeMsg.textContent = t.chatWelcome;
   }
 
   document.querySelectorAll('#community .post-actions button').forEach(btn => {
     if (btn.classList.contains('active')) {
       btn.textContent = t.huggedText;
-    } else {
-      const isHug = btn.textContent.includes('🤗');
-      btn.textContent = isHug ? t.hugText : t.encourageText;
+    } else if (btn.textContent.includes('🤗')) {
+      btn.textContent = t.hugText;
     }
   });
-
-  document.querySelectorAll('.nav-item div:last-child').forEach((el, i) => {
-    const navTexts = [t.navHome, t.navChat, t.navJournal, t.navCommunity, t.navProfile];
-    if (navTexts[i]) el.textContent = navTexts[i];
-  });
-
-  const moodLabels = document.querySelectorAll('#mood-journal .mood-option span');
-  const moodLabelTexts = moodLabelsMap[currentLang];
-  moodLabels.forEach((label, i) => {
-    if (moodLabelTexts[i]) label.textContent = moodLabelTexts[i];
-  });
-
-  const sourceBtns = document.querySelectorAll('#mood-journal .source-grid button');
-  const sourceLabelSet = sourceLabels[currentLang];
-  sourceBtns.forEach(btn => {
-    for (const key in sourceLabelSet) {
-      if (btn.getAttribute('onclick')?.includes(`'${key}'`)) {
-        btn.textContent = sourceLabelSet[key];
-        break;
-      }
-    }
-  });
-
-  const gratitude = document.getElementById('gratitude');
-  if (gratitude) gratitude.placeholder = t.gratitudePlaceholder;
-
-  const homeMoodBtns = document.querySelectorAll('#home .mood-btn');
-  homeMoodBtns.forEach((btn, i) => {
-    if (moodLabelTexts[i]) btn.setAttribute('aria-label', moodLabelTexts[i]);
-  });
-
-  const stepDesc1 = document.getElementById('stepDesc1');
-  if (stepDesc1) stepDesc1.textContent = t.moodStep1Desc;
-
-  const stepDesc2 = document.getElementById('stepDesc2');
-  if (stepDesc2) stepDesc2.textContent = t.moodStep2Desc;
-
-  const stepDesc3 = document.getElementById('stepDesc3');
-  if (stepDesc3) stepDesc3.textContent = t.moodStep3Desc;
-
-  const paywallTitle = document.getElementById('paywallTitle');
-  if (paywallTitle) paywallTitle.textContent = t.paywallTitle;
-
-  const paywallDesc = document.getElementById('paywallDesc');
-  if (paywallDesc) paywallDesc.textContent = t.paywallDesc;
-
-  const paywallPremiumBadge = document.getElementById('paywallPremiumBadge');
-  if (paywallPremiumBadge) paywallPremiumBadge.textContent = t.premiumBadge;
-
-  const paywallPremiumTitle = document.getElementById('paywallPremiumTitle');
-  if (paywallPremiumTitle) paywallPremiumTitle.textContent = t.premiumTitle;
-
-  const paywallPremiumBtn = document.getElementById('paywallPremiumBtn');
-  if (paywallPremiumBtn) paywallPremiumBtn.textContent = t.premiumBtn;
-
-  const paywallAnnualBadge = document.getElementById('paywallAnnualBadge');
-  if (paywallAnnualBadge) paywallAnnualBadge.textContent = t.annualBadge;
-
-  const paywallAnnualTitle = document.getElementById('paywallAnnualTitle');
-  if (paywallAnnualTitle) paywallAnnualTitle.textContent = t.annualTitle;
-
-  const paywallAnnualSave = document.getElementById('paywallAnnualSave');
-  if (paywallAnnualSave) paywallAnnualSave.textContent = t.annualSave;
-
-  const paywallAnnualBtn = document.getElementById('paywallAnnualBtn');
-  if (paywallAnnualBtn) paywallAnnualBtn.textContent = t.annualBtn;
-
-  const paywallCloseBtn = document.getElementById('paywallCloseBtn');
-  if (paywallCloseBtn) paywallCloseBtn.textContent = t.paywallClose;
-
-  updateChatLimitIndicator();
 }
 
-function renderJourneyProgress() {
-  const progress = getStoredProgress();
-  const dayCards = document.querySelectorAll('#journey .day-card');
-  dayCards.forEach(card => {
-    const dayNum = parseInt(card.textContent);
-    card.className = 'day-card';
-    if (progress.completedDays.includes(dayNum)) {
-      card.classList.add('completed');
-    } else if (dayNum === progress.currentDay) {
-      card.classList.add('current');
-    } else {
-      card.classList.add('locked');
-    }
-  });
-
-  const barFill = document.getElementById('journeyBarFill');
-  if (barFill) barFill.style.width = (progress.currentDay / 30 * 100) + '%';
-
-  const homeProgressBar = document.getElementById('homeProgressBar');
-  if (homeProgressBar) homeProgressBar.style.width = (progress.currentDay / 30 * 100) + '%';
-
-  const dayNumEl = document.getElementById('journeyDayNum');
-  if (dayNumEl) dayNumEl.textContent = progress.currentDay;
-
-  const currentDayEl = document.getElementById('currentDay');
-  if (currentDayEl) currentDayEl.textContent = progress.currentDay;
-
-  const percentEl = document.getElementById('journeyPercent');
-  if (percentEl) percentEl.textContent = Math.round(progress.currentDay / 30 * 100);
-
-  const stageIdx = progress.currentDay <= 10 ? 0 : progress.currentDay <= 20 ? 1 : 2;
-  const stageEmojis = ['🌱', '🌿', '🌳'];
-  const stage = { emoji: stageEmojis[stageIdx], label: treeStageLabelsMap[currentLang][stageIdx] };
-
-  const treeStage = document.getElementById('journeyTreeStage');
-  if (treeStage) treeStage.textContent = stage.emoji;
-
-  const treeEmoji = document.querySelector('#treeStageDisplay .tree-emoji');
-  if (treeEmoji) treeEmoji.textContent = stage.emoji;
-
-  const treeLabel = document.querySelector('#treeStageDisplay .tree-label');
-  if (treeLabel) treeLabel.textContent = stage.label;
-}
-
-function initChat() {
-  const t = responses[currentLang];
-  const messagesEl = document.getElementById('messages');
-  messagesEl.innerHTML = '';
-
-  if (chatHistory.length === 0) {
-    chatHistory = [{ role: 'assistant', content: t.chatWelcome }];
-  }
-
-  chatHistory.forEach(msg => {
-    const div = document.createElement('div');
-    div.className = 'message ' + (msg.role === 'user' ? 'user' : 'ai');
-    div.textContent = msg.content;
-    messagesEl.appendChild(div);
-  });
-
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-
-function handleKeyPress(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
-}
-
-async function fetchDailyQuote() {
-  try {
-    const response = await fetch(DEEPSEEK_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: 'deepseek-chat',
-        messages: [
-          { role: 'system', content: QUOTE_PROMPT[currentLang] },
-          { role: 'user', content: QUOTE_REQUEST_USER[currentLang] },
-        ],
-        temperature: 0.8,
-        max_tokens: 60,
-      }),
-    });
-    if (!response.ok) throw new Error('Failed');
-    const data = await response.json();
-    const quote = data.choices?.[0]?.message?.content;
-    if (quote) {
-      const el = document.getElementById('dailyQuote');
-      if (el) el.textContent = `"${quote.replace(/^"|"$/g, '')}"`;
-    }
-  } catch (e) {
-    const el = document.getElementById('dailyQuote');
-    if (el) {
-      const quotes = fallbackQuotes[currentLang];
-      el.textContent = quotes[Math.floor(Math.random() * quotes.length)];
-    }
-  }
-}
-
-function initProfileStats() {
-  const progress = getStoredProgress();
-  const daysTogether = progress.currentDay + 20;
-  const streak = Math.min(progress.currentDay, 7);
-
-  const daysEl = document.getElementById('daysTogether');
-  if (daysEl) daysEl.textContent = daysTogether;
-
-  const streakEl = document.getElementById('streakCount');
-  if (streakEl) streakEl.textContent = streak;
-
-  const streakBar = document.getElementById('streakBar');
-  if (streakBar) {
-    streakBar.innerHTML = '';
-    for (let i = 0; i < 7; i++) {
-      const span = document.createElement('span');
-      if (i < streak) {
-        span.className = 'streak-done';
-        span.textContent = '🔥';
-      } else {
-        span.className = 'streak-empty';
-        span.textContent = '·';
-      }
-      streakBar.appendChild(span);
-    }
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
+function init() {
   const savedLang = localStorage.getItem('lumi_lang');
   if (savedLang && LANGUAGES[savedLang]) {
     currentLang = savedLang;
   }
 
-  const langSelect = document.getElementById('langSelect');
-  if (langSelect) langSelect.value = currentLang;
-
-  chatHistory = loadChatHistory();
-
-  setTimeout(() => {
-    navigateTo('home');
-    applyTranslations();
-    renderJourneyProgress();
-    initChat();
-    initProfileStats();
-    fetchDailyQuote();
-    initSubscription();
-  }, 3500);
-
-  try {
-    const savedJournal = localStorage.getItem(STORAGE_KEYS.journal);
-    if (savedJournal) {
-      const textarea = document.getElementById('journalTextarea');
-      if (textarea) textarea.value = savedJournal;
-    }
-  } catch (e) {}
-
-  const msgInput = document.getElementById('msg');
-  if (msgInput) {
-    msgInput.addEventListener('keypress', handleKeyPress);
+  const savedPage = localStorage.getItem('lumi_lastPage');
+  if (savedPage && savedPage !== 'welcome') {
+    navigateTo(savedPage);
   }
 
-  const sendBtn = document.querySelector('#chat .btn');
-  if (sendBtn) {
-    sendBtn.addEventListener('click', sendMessage);
+  const select = document.getElementById('langSelect');
+  if (select) select.value = currentLang;
+
+  applyTranslations();
+
+  const savedJournal = localStorage.getItem(STORAGE_KEYS.journal);
+  const journalTextarea = document.getElementById('journalTextarea');
+  if (savedJournal && journalTextarea) {
+    journalTextarea.value = savedJournal;
   }
 
-  const langSelectEl = document.getElementById('langSelect');
-  if (langSelectEl) {
-    langSelectEl.addEventListener('change', (e) => {
-      setLang(e.target.value);
+  const savedGratitude = localStorage.getItem('lumi_gratitude');
+  const gratitudeEl = document.getElementById('gratitude');
+  if (savedGratitude && gratitudeEl) {
+    gratitudeEl.value = savedGratitude;
+  }
+
+  const savedMood = localStorage.getItem('lumi_mood');
+  if (savedMood) {
+    document.querySelectorAll('.mood-btn').forEach(btn => {
+      if (btn.dataset.mood === savedMood) btn.classList.add('active');
     });
+    document.body.classList.add('mood-' + savedMood);
   }
 
-  document.querySelectorAll('.day-card').forEach(card => {
-    card.addEventListener('click', () => {
-      const dayNum = parseInt(card.textContent);
-      if (card.classList.contains('current')) {
-        if (confirm(CONFIRM_MESSAGES[currentLang](dayNum))) {
-          completeTask();
-        }
-      }
-    });
+  gratitudeEl?.addEventListener('input', (e) => {
+    localStorage.setItem('lumi_gratitude', e.target.value);
   });
-});
+}
+
+document.addEventListener('DOMContentLoaded', init);
