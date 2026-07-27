@@ -1,7 +1,45 @@
-const screens = ['splash', 'home', 'chat', 'mood-journal', 'journey', 'community', 'profile'];
-let currentLang = 'en';
+const API_BASE = 'https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev';
+const STORAGE_KEYS = {
+  journal: 'dailyJournal',
+  moodData: 'moodJournal',
+  chatHistory: 'lumiChatHistory',
+  progress: 'journeyProgress',
+  streak: 'streakCount',
+  lastVisit: 'lastVisitDate'
+};
 
-const translations = {
+let currentLang = 'en';
+let chatHistory = [];
+
+const greetings = [
+  'Good evening.',
+  'Welcome back.',
+  'How are you today?',
+  'I missed you.',
+  'Take a breath.'
+];
+
+const responses = {
+  en: {
+    homeTitle: 'Good evening.',
+    homeSubtitle: 'How are you feeling today?',
+    chatSubtitle: 'Take your time.\nI\'m here to listen.',
+    journalTitle: 'Today\'s Journal',
+    journalDesc: 'What happened today?',
+    journeyLabel: 'Little Journey',
+    moodTitle: 'Mood Journal',
+    moodStep1: 'How are you feeling?',
+    moodStep2: 'What\'s weighing on you?',
+    moodStep3: 'A little gratitude',
+    journeyTitle: 'Little Journey',
+    journeySubtitle: '30 Days of Restart',
+    communityTitle: 'Tree Hole',
+    profileTitle: 'My Profile',
+    saveText: 'Save Journal',
+    markComplete: 'Mark Complete',
+    send: 'Send',
+    placeholder: 'Tell me anything...'
+  },
   fi: {
     homeTitle: 'Hyvää iltaa.',
     homeSubtitle: 'Miten sinä tunnetyt tänään?',
@@ -16,11 +54,15 @@ const translations = {
     journeyTitle: 'Pieni Matka',
     journeySubtitle: '30 päivää uudelleen aloittamista',
     communityTitle: 'Puuaukko',
-    profileTitle: 'Profiilini'
+    profileTitle: 'Profiilini',
+    saveText: 'Tallenna päiväkirja',
+    markComplete: 'Merkitse valmiiksi',
+    send: 'Lähetä',
+    placeholder: 'Kerro minulle mitä tahansa...'
   }
 };
 
-const lumiResponsePatterns = [
+const lumiFallbackPatterns = [
   { empathy: 'That sounds really hard.', ack: 'Thank you for telling me.', question: 'Do you want to share more?' },
   { empathy: 'I can hear how much this weighs on you.', ack: 'It takes courage to talk about this.', question: 'How long have you been feeling this way?' },
   { empathy: 'I\'m so sorry you\'re going through this.', ack: 'Whatever you\'re feeling is valid.', question: 'Is there anything I can do to help?' },
@@ -31,16 +73,56 @@ const lumiResponsePatterns = [
   { empathy: 'I\'m here with you in this.', ack: 'You don\'t have to carry this alone.', question: 'What would help you feel better today?' }
 ];
 
-function getLumiResponse() {
-  const pattern = lumiResponsePatterns[Math.floor(Math.random() * lumiResponsePatterns.length)];
-  return `${pattern.empathy} ${pattern.ack} ${pattern.question}`;
+const moodColors = {
+  '😊': '#F0F5F8',
+  '🙂': '#FAF8F4',
+  '😔': '#F2F4F0',
+  '😭': '#F4F0F2'
+};
+
+const sources = ['work', 'money', 'family', 'relationship', 'health', 'other'];
+const sourceLabels = {
+  work: '💼 Work',
+  money: '💰 Money',
+  family: '👨‍👩‍👧 Family',
+  relationship: '💞 Relationship',
+  health: '❤️ Health',
+  other: '📌 Other'
+};
+
+function getStoredProgress() {
+  const stored = localStorage.getItem(STORAGE_KEYS.progress);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {}
+  }
+  return { day: 6, completedDays: [1, 2, 3, 4, 5], currentDay: 6 };
+}
+
+function loadChatHistory() {
+  const stored = localStorage.getItem(STORAGE_KEYS.chatHistory);
+  if (stored) {
+    try {
+      return JSON.parse(stored);
+    } catch (e) {}
+  }
+  return [{ role: 'assistant', content: 'Hi, I\'m Lumi. How are you feeling today?' }];
+}
+
+function saveChatHistory() {
+  try {
+    localStorage.setItem(STORAGE_KEYS.chatHistory, JSON.stringify(chatHistory.slice(-20)));
+  } catch (e) {}
+}
+
+function getLumiFallback() {
+  const p = lumiFallbackPatterns[Math.floor(Math.random() * lumiFallbackPatterns.length)];
+  return `${p.empathy} ${p.ack} ${p.question}`;
 }
 
 function navigateTo(screenId) {
-  screens.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.classList.remove('active');
-  });
+  document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
   const target = document.getElementById(screenId);
   if (target) target.classList.add('active');
   window.scrollTo(0, 0);
@@ -48,157 +130,180 @@ function navigateTo(screenId) {
 }
 
 function updateNavActive(screenId) {
+  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4 };
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => item.classList.remove('active'));
-  const navMap = {
-    'home': 0,
-    'chat': 1,
-    'mood-journal': 2,
-    'community': 3,
-    'profile': 4
-  };
   if (navMap[screenId] !== undefined) {
     navItems[navMap[screenId]].classList.add('active');
   }
 }
 
 function selectMood(btn) {
-  const moodBtns = btn.parentElement.querySelectorAll('button');
-  moodBtns.forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  
-  const moodColors = {
-    '😊': '#F0F5F8',
-    '🙂': '#FAF8F4',
-    '😔': '#F2F4F0',
-    '😭': '#F4F0F2'
-  };
-  const emoji = btn.textContent;
-  document.body.style.background = moodColors[emoji] || '#FAF8F4';
+  document.body.style.background = moodColors[btn.textContent] || '#FAF8F4';
 }
 
 function saveJournal(textarea) {
-  localStorage.setItem('dailyJournal', textarea.value);
+  try {
+    localStorage.setItem(STORAGE_KEYS.journal, textarea.value);
+  } catch (e) {}
 }
 
-function handleKeyPress(e) {
-  if (e.key === 'Enter') sendMessage();
+function setLoading(buttonId, isLoading) {
+  const btn = document.getElementById(buttonId);
+  if (!btn) return;
+  if (isLoading) {
+    btn.disabled = true;
+    btn.style.opacity = '0.6';
+    btn.style.pointerEvents = 'none';
+  } else {
+    btn.disabled = false;
+    btn.style.opacity = '';
+    btn.style.pointerEvents = '';
+  }
 }
 
-function sendMessage() {
+async function sendMessage() {
   const input = document.getElementById('msg');
-  const messages = document.getElementById('messages');
+  const messagesEl = document.getElementById('messages');
   const value = input.value.trim();
   if (!value) return;
+
+  const sendBtn = document.querySelector('#chat .btn');
+  setLoading('msg', true);
+  
+  const placeholder = document.querySelector('#chat .input-area input');
+  const originalPlaceholder = placeholder?.placeholder || '';
+  if (placeholder) placeholder.placeholder = 'Thinking...';
 
   const userMsg = document.createElement('div');
   userMsg.className = 'message user';
   userMsg.textContent = value;
-  messages.appendChild(userMsg);
+  messagesEl.appendChild(userMsg);
+  chatHistory.push({ role: 'user', content: value });
+  messagesEl.scrollTop = messagesEl.scrollHeight;
   input.value = '';
-  messages.scrollTop = messages.scrollHeight;
 
   const typing = document.createElement('div');
   typing.className = 'message ai typing';
   typing.innerHTML = '<span></span><span></span><span></span>';
-  messages.appendChild(typing);
-  messages.scrollTop = messages.scrollHeight;
+  messagesEl.appendChild(typing);
+  messagesEl.scrollTop = messagesEl.scrollHeight;
 
-  fetch('https://little-light-api.3ea33e698718c5066f5142f39596d1cb.workers.dev/api/chat', {
-    method: 'POST',
-    headers: { 
-      'Content-Type': 'application/json',
-      'X-API-Key': 'sk-2a0246f90ee2465a84b2954897915b89',
-    },
-    body: JSON.stringify({ messages: [{ role: 'user', content: value }] }),
-  })
-  .then(res => res.json())
-  .then(data => {
-    messages.removeChild(typing);
+  try {
+    const response = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ messages: chatHistory.slice(-10) }),
+    });
+
+    if (!response.ok) throw new Error('Network error');
+    const data = await response.json();
+    
+    messagesEl.removeChild(typing);
+    
+    if (data.error) {
+      throw new Error(data.error);
+    }
+
+    const reply = data.reply || getLumiFallback();
+    chatHistory.push({ role: 'assistant', content: reply });
+    saveChatHistory();
+
     const aiMsg = document.createElement('div');
     aiMsg.className = 'message ai';
-    const response = data.reply || getLumiResponse();
-    aiMsg.textContent = response;
-    messages.appendChild(aiMsg);
-    typeWriter(aiMsg, response);
-    messages.scrollTop = messages.scrollHeight;
-  })
-  .catch(() => {
-    messages.removeChild(typing);
+    aiMsg.textContent = reply;
+    messagesEl.appendChild(aiMsg);
+    typeWriter(aiMsg, reply);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+
+  } catch (error) {
+    messagesEl.removeChild(typing);
+    const reply = getLumiFallback();
+    chatHistory.push({ role: 'assistant', content: reply });
+    saveChatHistory();
+
     const aiMsg = document.createElement('div');
     aiMsg.className = 'message ai';
-    const response = getLumiResponse();
-    aiMsg.textContent = response;
-    messages.appendChild(aiMsg);
-    typeWriter(aiMsg, response);
-    messages.scrollTop = messages.scrollHeight;
-  });
+    aiMsg.textContent = reply;
+    messagesEl.appendChild(aiMsg);
+    typeWriter(aiMsg, reply);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  } finally {
+    setLoading('msg', false);
+    if (placeholder) placeholder.placeholder = originalPlaceholder;
+  }
 }
 
 function typeWriter(element, text) {
   element.textContent = '';
   let i = 0;
-  const speed = 50;
-  function type() {
+  const speed = 40;
+  const type = () => {
     if (i < text.length) {
       element.textContent += text.charAt(i);
       i++;
       setTimeout(type, speed);
     }
-  }
+  };
   type();
 }
 
-let selectedMood = null;
-const selectedSources = new Set();
-
 function selectMoodOption(btn, mood) {
-  const moodBtns = btn.parentElement.querySelectorAll('button');
-  moodBtns.forEach(b => b.classList.remove('active'));
+  btn.parentElement.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  selectedMood = mood;
+  btn.dataset.mood = mood;
 }
 
 function toggleSource(btn, source) {
   btn.classList.toggle('active');
-  if (btn.classList.contains('active')) {
-    selectedSources.add(source);
-  } else {
-    selectedSources.delete(source);
-  }
 }
 
 function saveMoodJournal() {
   const gratitude = document.getElementById('gratitude').value;
+  const selectedMood = document.querySelector('#mood-journal .mood-grid button.active')?.dataset.mood || 'calm';
+  const selectedSources = [];
+  document.querySelectorAll('#mood-journal .source-grid button.active').forEach(b => selectedSources.push(b.textContent.trim()));
+  
   const data = {
     mood: selectedMood,
-    sources: Array.from(selectedSources),
+    sources: selectedSources,
     gratitude: gratitude,
     date: new Date().toISOString()
   };
-  localStorage.setItem('moodJournal', JSON.stringify(data));
   
-  const btn = document.querySelector('#mood-journal .btn');
+  try {
+    localStorage.setItem(STORAGE_KEYS.moodData, JSON.stringify(data));
+  } catch (e) {}
+  
+  const btn = document.querySelector('#mood-journal .gratitude-section .btn');
+  const originalText = btn.textContent;
   btn.textContent = 'Saved ✨';
   btn.style.background = '#A8CFA8';
   
   setTimeout(() => {
     navigateTo('home');
-    btn.textContent = currentLang === 'en' ? 'Save Journal' : 'Tallenna päiväkirja';
+    btn.textContent = originalText;
     btn.style.background = '';
-  }, 1000);
+  }, 1500);
 }
 
 function completeTask() {
-  const btn = document.querySelector('#journey .btn');
-  btn.textContent = 'Completed 🌿';
-  btn.style.background = '#A8CFA8';
+  const progress = getStoredProgress();
+  progress.completedDays.push(progress.currentDay);
+  progress.currentDay = Math.min(progress.currentDay + 1, 30);
+  
+  try {
+    localStorage.setItem(STORAGE_KEYS.progress, JSON.stringify(progress));
+  } catch (e) {}
   
   createParticles();
   
   setTimeout(() => {
     const treeStage = document.querySelector('#journey .tree-stage');
     if (treeStage) {
+      treeStage.textContent = progress.currentDay <= 10 ? '🌱' : progress.currentDay <= 20 ? '🌳' : '🌲';
       treeStage.classList.remove('growing');
       void treeStage.offsetWidth;
       treeStage.classList.add('growing');
@@ -207,8 +312,6 @@ function completeTask() {
   
   setTimeout(() => {
     navigateTo('home');
-    btn.textContent = 'Mark Complete';
-    btn.style.background = '';
   }, 2000);
 }
 
@@ -218,28 +321,22 @@ function createParticles() {
   document.body.appendChild(container);
   
   const particles = ['🍃', '🌿', '🌸', '✨', '🌼'];
-  for (let i = 0; i < 15; i++) {
-    const particle = document.createElement('div');
-    particle.className = 'particle';
-    particle.textContent = particles[Math.floor(Math.random() * particles.length)];
-    particle.style.left = Math.random() * 100 + '%';
-    particle.style.animationDelay = Math.random() * 2 + 's';
-    particle.style.fontSize = (16 + Math.random() * 16) + 'px';
-    container.appendChild(particle);
+  for (let i = 0; i < 20; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = particles[Math.floor(Math.random() * particles.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDelay = Math.random() * 2 + 's';
+    p.style.fontSize = (12 + Math.random() * 20) + 'px';
+    container.appendChild(p);
   }
   
-  setTimeout(() => {
-    document.body.removeChild(container);
-  }, 4000);
+  setTimeout(() => document.body.removeChild(container), 4000);
 }
 
 function toggleHug(btn) {
   btn.classList.toggle('active');
-  if (btn.classList.contains('active')) {
-    btn.innerHTML = '🤗 Hugged';
-  } else {
-    btn.innerHTML = '🤗 Hug';
-  }
+  btn.innerHTML = btn.classList.contains('active') ? '🤗 Hugged' : '🤗 Hug';
 }
 
 function showEncourage(btn) {
@@ -248,11 +345,12 @@ function showEncourage(btn) {
     'Keep going, you\'re doing great 🌟',
     'You matter, and you are not alone 🤍',
     'Every small step counts 🌱',
-    'I believe in you 💖'
+    'I believe in you 💖',
+    'Your courage inspires others ✨',
+    'One day at a time, one breath at a time 🌬️'
   ];
-  const randomEncourage = encourages[Math.floor(Math.random() * encourages.length)];
   if (!btn.classList.contains('active')) {
-    btn.innerHTML = `💝 ${randomEncourage}`;
+    btn.innerHTML = `💝 ${encourages[Math.floor(Math.random() * encourages.length)]}`;
     btn.classList.add('active');
     setTimeout(() => {
       btn.innerHTML = '💝 Encourage';
@@ -263,50 +361,143 @@ function showEncourage(btn) {
 
 function toggleLanguage() {
   currentLang = currentLang === 'en' ? 'fi' : 'en';
-  const btn = document.getElementById('langBtn');
+  btn = document.getElementById('langBtn');
   btn.textContent = currentLang === 'en' ? 'EN' : 'FI';
+  applyTranslations();
+}
+
+function applyTranslations() {
+  const t = responses[currentLang];
+  document.getElementById('homeTitle').textContent = greetings[Math.floor(Math.random() * greetings.length)];
+  document.getElementById('homeSubtitle').textContent = t.homeSubtitle;
+  document.getElementById('journalTitle').textContent = t.journalTitle;
+  document.getElementById('journalDesc').textContent = t.journalDesc;
+  document.getElementById('journeyLabel').textContent = t.journeyLabel;
+  document.getElementById('moodTitle').textContent = t.moodTitle;
+  document.getElementById('moodStep1').textContent = t.moodStep1;
+  document.getElementById('moodStep2').textContent = t.moodStep2;
+  document.getElementById('moodStep3').textContent = t.moodStep3;
+  document.getElementById('journeyTitle').textContent = t.journeyTitle;
+  document.getElementById('journeySubtitle').textContent = t.journeySubtitle;
+  document.getElementById('communityTitle').textContent = t.communityTitle;
+  document.getElementById('profileTitle').textContent = t.profileTitle;
+  document.getElementById('msg').placeholder = t.placeholder;
   
-  if (currentLang === 'fi') {
-    document.getElementById('homeTitle').textContent = translations.fi.homeTitle;
-    document.getElementById('homeSubtitle').textContent = translations.fi.homeSubtitle;
-    document.getElementById('chatSubtitle').innerHTML = translations.fi.chatSubtitle;
-    document.getElementById('journalTitle').textContent = translations.fi.journalTitle;
-    document.getElementById('journalDesc').textContent = translations.fi.journalDesc;
-    document.getElementById('journeyLabel').textContent = translations.fi.journeyLabel;
-    document.getElementById('moodTitle').textContent = translations.fi.moodTitle;
-    document.getElementById('moodStep1').textContent = translations.fi.moodStep1;
-    document.getElementById('moodStep2').textContent = translations.fi.moodStep2;
-    document.getElementById('moodStep3').textContent = translations.fi.moodStep3;
-    document.getElementById('journeyTitle').textContent = translations.fi.journeyTitle;
-    document.getElementById('journeySubtitle').textContent = translations.fi.journeySubtitle;
-    document.getElementById('communityTitle').textContent = translations.fi.communityTitle;
-    document.getElementById('profileTitle').textContent = translations.fi.profileTitle;
-  } else {
-    document.getElementById('homeTitle').textContent = 'Good Evening.';
-    document.getElementById('homeSubtitle').textContent = 'How are you feeling today?';
-    document.getElementById('chatSubtitle').innerHTML = 'Take your time.<br>I\'m here to listen.';
-    document.getElementById('journalTitle').textContent = 'Today\'s Journal';
-    document.getElementById('journalDesc').textContent = 'What happened today?';
-    document.getElementById('journeyLabel').textContent = 'Little Journey';
-    document.getElementById('moodTitle').textContent = 'Mood Journal';
-    document.getElementById('moodStep1').textContent = 'How are you feeling?';
-    document.getElementById('moodStep2').textContent = 'What\'s weighing on you?';
-    document.getElementById('moodStep3').textContent = 'A little gratitude';
-    document.getElementById('journeyTitle').textContent = 'Little Journey';
-    document.getElementById('journeySubtitle').textContent = '30 Days of Restart';
-    document.getElementById('communityTitle').textContent = 'Tree Hole';
-    document.getElementById('profileTitle').textContent = 'My Profile';
+  const saveBtn = document.querySelector('#mood-journal .gratitude-section .btn');
+  if (saveBtn) saveBtn.textContent = t.saveText;
+  
+  const completeBtn = document.querySelector('#journey .card .btn');
+  if (completeBtn) completeBtn.textContent = t.markComplete;
+}
+
+function renderJourneyProgress() {
+  const progress = getStoredProgress();
+  const dayCards = document.querySelectorAll('#journey .day-card');
+  dayCards.forEach(card => {
+    const dayNum = parseInt(card.textContent);
+    card.className = 'day-card';
+    if (progress.completedDays.includes(dayNum)) {
+      card.classList.add('completed');
+    } else if (dayNum === progress.currentDay) {
+      card.classList.add('current');
+    } else {
+      card.classList.add('locked');
+    }
+  });
+  
+  const barFill = document.querySelector('#journey .bar-fill');
+  if (barFill) barFill.style.width = (progress.currentDay / 30 * 100) + '%';
+  
+  const stats = document.querySelectorAll('#journey .stats span');
+  if (stats[0]) stats[0].textContent = `Day ${progress.currentDay} / 30`;
+  if (stats[1]) stats[1].textContent = `${Math.round(progress.currentDay / 30 * 100)}% Complete`;
+  
+  const treeStage = document.querySelector('#journey .tree-stage');
+  if (treeStage) {
+    treeStage.textContent = progress.currentDay <= 10 ? '🌱' : progress.currentDay <= 20 ? '🌳' : '🌲';
   }
 }
 
+function initChat() {
+  const messagesEl = document.getElementById('messages');
+  messagesEl.innerHTML = '';
+  
+  chatHistory.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'message ' + (msg.role === 'user' ? 'user' : 'ai');
+    div.textContent = msg.content;
+    messagesEl.appendChild(div);
+  });
+  
+  messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function handleKeyPress(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+async function fetchDailyQuote() {
+  try {
+    const response = await fetch(`${API_BASE}/api/quote`);
+    if (!response.ok) throw new Error('Failed');
+    const data = await response.json();
+    if (data.quote) {
+      document.querySelectorAll('.quote-text')[0].textContent = `"${data.quote.replace(/^"|"$/g, '')}"`;
+    }
+  } catch (e) {
+    // Keep default quote
+  }
+}
+
+function initProfileStats() {
+  const progress = getStoredProgress();
+  const daysTogether = progress.currentDay + 6;
+  
+  const statCards = document.querySelectorAll('#profile .stat-card .value');
+  if (statCards[0]) statCards[0].textContent = daysTogether;
+  if (statCards[1]) statCards[1].textContent = Math.min(progress.currentDay, 30);
+  
+  let journalCount = 0;
+  for (let i = 0; i < 30; i++) {
+    try {
+      const key = `moodJournal_${new Date(Date.now() - i * 86400000).toISOString().split('T')[0]}`;
+      if (localStorage.getItem(key)) journalCount++;
+    } catch (e) {}
+  }
+  if (journalCount === 0) journalCount = progress.completedDays.length;
+  if (statCards[2]) statCards[2].textContent = journalCount;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  chatHistory = loadChatHistory();
+  
   setTimeout(() => {
     navigateTo('home');
+    applyTranslations();
+    renderJourneyProgress();
+    initChat();
+    initProfileStats();
+    fetchDailyQuote();
   }, 3500);
-
-  const savedJournal = localStorage.getItem('dailyJournal');
-  if (savedJournal) {
-    const textarea = document.querySelector('#home .journal-card textarea');
-    if (textarea) textarea.value = savedJournal;
+  
+  try {
+    const savedJournal = localStorage.getItem(STORAGE_KEYS.journal);
+    if (savedJournal) {
+      const textarea = document.querySelector('#home .journal-card textarea');
+      if (textarea) textarea.value = savedJournal;
+    }
+  } catch (e) {}
+  
+  const msgInput = document.getElementById('msg');
+  if (msgInput) {
+    msgInput.addEventListener('keypress', handleKeyPress);
+  }
+  
+  const sendBtn = document.querySelector('#chat .btn');
+  if (sendBtn) {
+    sendBtn.addEventListener('click', sendMessage);
   }
 });
