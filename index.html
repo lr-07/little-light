@@ -1,11 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
   <meta name="theme-color" content="#A8CFA8">
-  <meta name="description" content="Little Light - A gentle AI companion for difficult days">
-  <title>Little Light - A small light for difficult days</title>
+  <meta name="description" content="小光 - 温柔的AI陪伴，陪你走过每一个难熬的日子">
+  <title>小光 - 难熬的日子里的一点光</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -15,60 +19,101 @@
 
   <div id="app">
     <section id="splash" class="screen active">
-      <div class="cloud">☁️</div>
-      <div class="cloud">☁️</div>
-      <div class="cloud">☁️</div>
-      <div class="stars">✨</div>
-      <div class="stars">⭐</div>
-      <div class="stars">🌟</div>
-      <div class="moon">🌙</div>
-      <h1>Little Light</h1>
-      <p>A small light for difficult days.</p>
-      <small>No one should face difficult days alone.</small>
+      <div class="splash-scene">
+        <svg class="scene-svg" viewBox="0 0 400 600" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#d4e4f7"/>
+              <stop offset="60%" style="stop-color:#e8f0ea"/>
+              <stop offset="100%" style="stop-color:#faf8f4"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="600" fill="url(#skyGrad)"/>
+          <circle class="moon-svg" cx="320" cy="100" r="35" fill="#f5f0e0" opacity="0.9"/>
+          <circle cx="310" cy="95" r="30" fill="#faf5e8" opacity="0.8"/>
+          <ellipse class="cloud cloud1" cx="80" cy="120" rx="50" ry="18" fill="#fff" opacity="0.6"/>
+          <ellipse class="cloud cloud2" cx="300" cy="180" rx="60" ry="20" fill="#fff" opacity="0.5"/>
+          <ellipse class="cloud cloud3" cx="150" cy="80" rx="40" ry="14" fill="#fff" opacity="0.4"/>
+          <polygon class="mountain m1" points="0,400 100,250 180,350 250,200 320,300 400,280 400,400" fill="#c8d8d0" opacity="0.6"/>
+          <polygon class="mountain m2" points="0,380 80,280 160,340 220,260 300,320 400,300 400,380" fill="#b8c8c0" opacity="0.5"/>
+          <polygon class="mountain m3" points="0,420 120,340 200,380 280,320 360,370 400,350 400,420" fill="#a8b8b0" opacity="0.4"/>
+          <circle class="star star1" cx="60" cy="50" r="2" fill="#fff"/>
+          <circle class="star star2" cx="120" cy="30" r="1.5" fill="#fff"/>
+          <circle class="star star3" cx="200" cy="60" r="1" fill="#fff"/>
+          <circle class="star star4" cx="280" cy="40" r="2" fill="#fff"/>
+          <circle class="star star5" cx="350" cy="70" r="1.5" fill="#fff"/>
+          <circle class="star star6" cx="180" cy="100" r="1" fill="#fff"/>
+          <circle class="star star7" cx="100" cy="90" r="1.5" fill="#fff"/>
+          <circle class="star star8" cx="250" cy="80" r="1" fill="#fff"/>
+        </svg>
+      </div>
+      <div class="splash-content">
+        <h1>小光</h1>
+        <p>难熬的日子里的一点光</p>
+        <small>你不需要独自面对一切</small>
+      </div>
     </section>
 
     <section id="home" class="screen">
+      <div class="header-bg">
+        <svg class="bg-scene" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
+          <defs>
+            <linearGradient id="homeSky" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" style="stop-color:#e8f0ea"/>
+              <stop offset="100%" style="stop-color:#faf8f4"/>
+            </linearGradient>
+          </defs>
+          <rect width="400" height="200" fill="url(#homeSky)"/>
+          <circle cx="340" cy="50" r="25" fill="#f5f0e0" opacity="0.7"/>
+          <ellipse cx="60" cy="80" rx="35" ry="12" fill="#fff" opacity="0.5"/>
+          <ellipse cx="280" cy="120" rx="40" ry="14" fill="#fff" opacity="0.4"/>
+          <polygon points="0,180 60,120 120,160 180,100 240,140 300,110 400,150 400,200 0,200" fill="#c8d8d0" opacity="0.4"/>
+          <polygon points="0,190 80,140 160,170 220,130 300,160 400,140 400,200 0,200" fill="#b8c8c0" opacity="0.3"/>
+        </svg>
+      </div>
       <div class="header">
-        <div class="moon">🌙</div>
-        <h2 id="homeTitle">Good evening.</h2>
-        <p id="homeSubtitle">How are you feeling today?</p>
+        <h2 id="homeTitle">晚上好 🌙</h2>
+        <p id="homeSubtitle">今天辛苦了。</p>
+        <p class="prompt-text" id="promptText">今天心情怎么样？</p>
       </div>
       <div class="moods">
-        <button onclick="selectMood(this)" aria-label="Happy">😊</button>
-        <button onclick="selectMood(this)" aria-label="Calm">🙂</button>
-        <button onclick="selectMood(this)" aria-label="Sad">😔</button>
-        <button onclick="selectMood(this)" aria-label="Overwhelmed">😭</button>
+        <button onclick="selectMood(this)" aria-label="开心">😊</button>
+        <button onclick="selectMood(this)" aria-label="平静">🙂</button>
+        <button onclick="selectMood(this)" aria-label="一般">😐</button>
+        <button onclick="selectMood(this)" aria-label="难过">😔</button>
+        <button onclick="selectMood(this)" aria-label="崩溃">😭</button>
       </div>
       <div class="divider"></div>
       <div class="chat-entry">
-        <p class="subtitle" id="chatSubtitle">Take your time.<br>I'm here to listen.</p>
-        <button class="btn" onclick="navigateTo('chat')">Talk with Lumi</button>
+        <p class="subtitle" id="chatSubtitle">慢慢来，<br>我在这里听你说。</p>
+        <button class="btn" onclick="navigateTo('chat')">和 Lumi 聊聊</button>
       </div>
       <div class="divider"></div>
       <div class="card journal-card">
         <div class="card-header">
           <div class="card-icon">📝</div>
           <div>
-            <div class="card-title" id="journalTitle">Today's Journal</div>
-            <div class="card-desc" id="journalDesc">What happened today?</div>
+            <div class="card-title" id="journalTitle">今天发生了什么？</div>
+            <div class="card-desc" id="journalDesc">写下来就会轻一点</div>
           </div>
         </div>
-        <textarea placeholder="Write anything that's on your mind..." oninput="saveJournal(this)"></textarea>
+        <textarea id="journalTextarea" placeholder="把心里的话写下来..." oninput="saveJournal(this)"></textarea>
       </div>
       <div class="card journey-card" onclick="navigateTo('journey')">
         <div class="tree">🌱</div>
         <div class="info">
-          <div class="label" id="journeyLabel">Little Journey</div>
-          <div class="value">Day 6</div>
+          <div class="label" id="journeyLabel">30天回血计划</div>
+          <div class="value">Day <span id="currentDay">7</span></div>
           <div class="progress">
-            <div class="progress-bar" style="width: 20%"></div>
+            <div class="progress-bar" id="homeProgressBar" style="width: 23%"></div>
           </div>
         </div>
+        <button class="btn btn-small">继续</button>
       </div>
       <div class="card quote-card">
         <div class="quote-icon">💫</div>
-        <div class="quote-text">"The sky doesn't ask you to be perfect."</div>
-        <div class="quote-author">— Today's gentle reminder</div>
+        <div class="quote-text" id="dailyQuote">"人生不是冲刺，只是今天慢一点。"</div>
+        <div class="quote-author">— 今日鼓励</div>
       </div>
     </section>
 
@@ -79,83 +124,90 @@
         <div class="title">Lumi</div>
       </div>
       <div id="messages" class="messages">
-        <div class="message ai">Hi, I'm Lumi. How are you feeling today?</div>
+        <div class="message ai">今天看起来有一点累。想和我聊聊吗？</div>
       </div>
       <div class="input-area">
-        <input id="msg" placeholder="Tell me anything..." autocomplete="off" onkeypress="handleKeyPress(event)">
-        <button class="btn" onclick="sendMessage()">Send</button>
+        <input id="msg" placeholder="告诉我任何事..." autocomplete="off" onkeypress="handleKeyPress(event)">
+        <button class="btn" onclick="sendMessage()">发送</button>
       </div>
     </section>
 
     <section id="mood-journal" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 id="moodTitle">Mood Journal</h2>
+        <h2 id="moodTitle">情绪记录</h2>
       </div>
       <div class="step">
         <div class="step-num">1</div>
-        <h3 id="moodStep1">How are you feeling?</h3>
-        <p>Select one that feels right</p>
+        <h3 id="moodStep1">今天感觉怎么样？</h3>
+        <p>选一个最符合的</p>
       </div>
       <div class="mood-grid">
-        <button onclick="selectMoodOption(this,'happy')">😊<span>Happy</span></button>
-        <button onclick="selectMoodOption(this,'calm')">🙂<span>Calm</span></button>
-        <button onclick="selectMoodOption(this,'sad')">😔<span>Sad</span></button>
-        <button onclick="selectMoodOption(this,'overwhelmed')">😭<span>Overwhelmed</span></button>
+        <button onclick="selectMoodOption(this,'happy')">😊<span>开心</span></button>
+        <button onclick="selectMoodOption(this,'calm')">🙂<span>平静</span></button>
+        <button onclick="selectMoodOption(this,'neutral')">😐<span>一般</span></button>
+        <button onclick="selectMoodOption(this,'sad')">😔<span>难过</span></button>
+        <button onclick="selectMoodOption(this,'overwhelmed')">😭<span>崩溃</span></button>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <h3 id="moodStep2">What's weighing on you?</h3>
-        <p>Choose one or more</p>
+        <h3 id="moodStep2">压力来自哪里？</h3>
+        <p>可以多选</p>
       </div>
       <div class="source-grid">
-        <button onclick="toggleSource(this,'work')">💼 Work</button>
-        <button onclick="toggleSource(this,'money')">💰 Money</button>
-        <button onclick="toggleSource(this,'family')">👨‍👩‍👧 Family</button>
-        <button onclick="toggleSource(this,'relationship')">💞 Relationship</button>
-        <button onclick="toggleSource(this,'health')">❤️ Health</button>
-        <button onclick="toggleSource(this,'other')">📌 Other</button>
+        <button onclick="toggleSource(this,'work')">💼 工作</button>
+        <button onclick="toggleSource(this,'money')">💰 金钱</button>
+        <button onclick="toggleSource(this,'family')">👨‍👩‍👧 家庭</button>
+        <button onclick="toggleSource(this,'relationship')">💞 感情</button>
+        <button onclick="toggleSource(this,'health')">❤️ 身体</button>
+        <button onclick="toggleSource(this,'other')">📌 其他</button>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <h3 id="moodStep3">A little gratitude</h3>
-        <p>Is there one small thing to be thankful for?</p>
+        <h3 id="moodStep3">今天有没有一件值得感谢的小事？</h3>
+        <p>哪怕只是一杯热茶</p>
       </div>
       <div class="gratitude-section">
-        <textarea id="gratitude" placeholder="Today, I'm grateful for..."></textarea>
-        <button class="btn" style="width:100%" onclick="saveMoodJournal()">Save Journal</button>
+        <textarea id="gratitude" placeholder="今天，我感谢..."></textarea>
+        <button class="btn" style="width:100%" onclick="saveMoodJournal()">保存记录</button>
       </div>
     </section>
 
     <section id="journey" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 id="journeyTitle">Little Journey</h2>
+        <h2 id="journeyTitle">30天重新出发</h2>
       </div>
       <div class="journey-header">
-        <div class="tree-stage">🌱</div>
-        <h3 id="journeySubtitle">30 Days of Restart</h3>
-        <p>Every day, take a small step forward</p>
+        <div class="tree-stage" id="journeyTreeStage">🌱</div>
+        <h3 id="journeySubtitle">每一天，都是新的开始</h3>
+        <p id="journeyDesc">完成今天的小事，让树长大一点</p>
       </div>
       <div class="progress-overall">
-        <div class="label">Progress</div>
+        <div class="label">整体进度</div>
         <div class="bar">
-          <div class="bar-fill" style="width: 20%"></div>
+          <div class="bar-fill" id="journeyBarFill" style="width: 23%"></div>
         </div>
         <div class="stats">
-          <span>Day 6 / 30</span>
-          <span>20% Complete</span>
+          <span>Day <span id="journeyDayNum">7</span> / 30</span>
+          <span><span id="journeyPercent">23</span>% 完成</span>
         </div>
       </div>
-      <h4 class="section-title">Your Journey</h4>
-      <div class="day-cards">
+      <div class="tree-visual">
+        <div class="tree-stage-display" id="treeStageDisplay">
+          <span class="tree-emoji">🌱</span>
+          <span class="tree-label">树苗</span>
+        </div>
+      </div>
+      <h4 class="section-title">你的旅程</h4>
+      <div class="day-cards" id="dayCards">
         <div class="day-card completed">1</div>
         <div class="day-card completed">2</div>
         <div class="day-card completed">3</div>
         <div class="day-card completed">4</div>
         <div class="day-card completed">5</div>
-        <div class="day-card current">6</div>
-        <div class="day-card locked">7</div>
+        <div class="day-card completed">6</div>
+        <div class="day-card current">7</div>
         <div class="day-card locked">8</div>
         <div class="day-card locked">9</div>
         <div class="day-card locked">10</div>
@@ -181,73 +233,76 @@
         <div class="day-card locked">30</div>
       </div>
       <div class="card task-card">
-        <h4 class="section-title">Today's Task</h4>
-        <p class="task-desc">Take three deep breaths and name one thing that made you smile today.</p>
-        <button class="btn" style="width:100%" onclick="completeTask()">Mark Complete</button>
+        <h4 class="section-title">今天的小任务</h4>
+        <p class="task-desc" id="todayTask">深呼吸三次，说出一件让你微笑的小事。</p>
+        <button class="btn" style="width:100%" onclick="completeTask()">完成今天的任务</button>
       </div>
     </section>
 
     <section id="community" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 id="communityTitle">Tree Hole</h2>
+        <h2 id="communityTitle">树洞社区</h2>
       </div>
       <div class="community-header">
-        <div class="title">Anonymous Sharing</div>
-        <div class="desc">Share your thoughts. You're not alone.</div>
+        <div class="title">匿名的温柔角落</div>
+        <div class="desc">在这里，你不是一个人</div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐰</div>
           <div>
-            <div class="post-author">Anonymous Friend</div>
-            <div class="post-time">2 hours ago</div>
+            <div class="post-author">匿名朋友</div>
+            <div class="post-time">2小时前</div>
           </div>
+          <div class="post-hug-count">❤️ 237</div>
         </div>
-        <div class="post-content">I feel so tired lately. Everything feels heavy, and I don't know how to keep going. But I'm trying.</div>
+        <div class="post-content">今天工资发了。还完房租，银行卡剩 427 元。真的很累。</div>
         <div class="ai-reply">
-          <div class="ai-label">Lumi's Reply</div>
-          <div>I'm so sorry you're carrying this weight. It takes so much courage just to keep trying. Thank you for being here and sharing this with us.</div>
+          <div class="ai-label">Lumi 回复</div>
+          <div>已经很努力了。今天的你，值得一句辛苦了。</div>
         </div>
         <div class="actions">
-          <button onclick="toggleHug(this)">🤗 Hug</button>
-          <button onclick="showEncourage(this)">💝 Encourage</button>
+          <button onclick="toggleHug(this)">🤗 抱抱TA</button>
+          <button onclick="showEncourage(this)">🌼 留一句鼓励</button>
         </div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐱</div>
           <div>
-            <div class="post-author">Anonymous Friend</div>
-            <div class="post-time">5 hours ago</div>
+            <div class="post-author">匿名朋友</div>
+            <div class="post-time">5小时前</div>
           </div>
+          <div class="post-hug-count">❤️ 189</div>
         </div>
-        <div class="post-content">Today was a good day. I went for a walk and saw a beautiful sunset. Sometimes the small moments are the ones that matter most.</div>
+        <div class="post-content">今天去散步了，看到了很漂亮的晚霞。有时候，小事情才最重要。</div>
         <div class="ai-reply">
-          <div class="ai-label">Lumi's Reply</div>
-          <div>That sounds so lovely. Celebrating the small moments is such a kind thing to do for yourself. Thank you for sharing this light with us.</div>
+          <div class="ai-label">Lumi 回复</div>
+          <div>能发现这样美好的瞬间，本身就是很温柔的事。谢谢你分享这份光。</div>
         </div>
         <div class="actions">
-          <button onclick="toggleHug(this)">🤗 Hug</button>
-          <button onclick="showEncourage(this)">💝 Encourage</button>
+          <button onclick="toggleHug(this)">🤗 抱抱TA</button>
+          <button onclick="showEncourage(this)">🌼 留一句鼓励</button>
         </div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐻</div>
           <div>
-            <div class="post-author">Anonymous Friend</div>
-            <div class="post-time">Yesterday</div>
+            <div class="post-author">匿名朋友</div>
+            <div class="post-time">昨天</div>
           </div>
+          <div class="post-hug-count">❤️ 312</div>
         </div>
-        <div class="post-content">I got rejected for the job I really wanted. I've been applying for months and nothing is working. I'm starting to doubt myself.</div>
+        <div class="post-content">面试被拒了。投了好几个月都没有回音，开始怀疑自己。</div>
         <div class="ai-reply">
-          <div class="ai-label">Lumi's Reply</div>
-          <div>Rejection is so hard, especially when you've put so much into it. Your worth isn't defined by one job or one "no." I believe in you, even when you can't.</div>
+          <div class="ai-label">Lumi 回复</div>
+          <div>被否定真的很难受。但今天发生的事情，不能定义你的全部。你已经很勇敢了。</div>
         </div>
         <div class="actions">
-          <button onclick="toggleHug(this)">🤗 Hug</button>
-          <button onclick="showEncourage(this)">💝 Encourage</button>
+          <button onclick="toggleHug(this)">🤗 抱抱TA</button>
+          <button onclick="showEncourage(this)">🌼 留一句鼓励</button>
         </div>
       </div>
     </section>
@@ -255,42 +310,53 @@
     <section id="profile" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 id="profileTitle">My Profile</h2>
+        <h2 id="profileTitle">我的</h2>
       </div>
       <div class="profile-header">
         <div class="avatar">🐰</div>
-        <h3>Dear Friend</h3>
-        <p>Your gentle companion is here</p>
+        <h3>亲爱的朋友</h3>
+        <p>你的温柔伙伴在这里</p>
       </div>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="value">12</div>
-          <div class="label">Days Together</div>
+      <div class="companion-row">
+        <div class="companion-item">
+          <div class="companion-value" id="daysTogether">27</div>
+          <div class="companion-label">已经陪伴你（天）</div>
         </div>
-        <div class="stat-card">
-          <div class="value">7</div>
-          <div class="label">Streak</div>
-        </div>
-        <div class="stat-card">
-          <div class="value">48</div>
-          <div class="label">Journal Entries</div>
+        <div class="companion-item">
+          <div class="companion-value" id="streakCount">7</div>
+          <div class="companion-label">连续打卡（天）</div>
         </div>
       </div>
-      <div class="card chart-card">
-        <h4>Mood Trends</h4>
-        <div class="chart">
-          <div class="bar" style="height:60%"></div>
-          <div class="bar" style="height:80%"></div>
-          <div class="bar high" style="height:90%"></div>
-          <div class="bar" style="height:40%"></div>
-          <div class="bar" style="height:70%"></div>
-          <div class="bar high" style="height:85%"></div>
-          <div class="bar" style="height:75%"></div>
+      <div class="streak-bar" id="streakBar">
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-done">🔥</span>
+        <span class="streak-empty">·</span>
+      </div>
+      <div class="growth-card">
+        <h4>🌱 成长变化</h4>
+        <div class="growth-stats">
+          <div class="growth-item">
+            <span class="growth-label">压力</span>
+            <span class="growth-value down">↓18%</span>
+          </div>
+          <div class="growth-item">
+            <span class="growth-label">睡眠</span>
+            <span class="growth-value up">↑22%</span>
+          </div>
+          <div class="growth-item">
+            <span class="growth-label">开心</span>
+            <span class="growth-value up">↑31%</span>
+          </div>
         </div>
       </div>
       <div class="quote-section">
-        <div class="quote-text">"You are doing better than you think."</div>
-        <div class="quote-date">Your daily quote</div>
+        <div class="quote-text">"慢一点，也是前进。"</div>
+        <div class="quote-date">— 属于你的话</div>
       </div>
     </section>
   </div>
@@ -299,27 +365,27 @@
     <div class="nav-items">
       <div class="nav-item active" onclick="navigateTo('home')">
         <div class="icon">🏠</div>
-        <div>Home</div>
+        <div>首页</div>
       </div>
       <div class="nav-item" onclick="navigateTo('chat')">
         <div class="icon">💬</div>
-        <div>Chat</div>
+        <div>聊天</div>
       </div>
       <div class="nav-item" onclick="navigateTo('mood-journal')">
         <div class="icon">📝</div>
-        <div>Journal</div>
+        <div>记录</div>
       </div>
       <div class="nav-item" onclick="navigateTo('community')">
         <div class="icon">🌳</div>
-        <div>Community</div>
+        <div>树洞</div>
       </div>
       <div class="nav-item" onclick="navigateTo('profile')">
         <div class="icon">👤</div>
-        <div>Profile</div>
+        <div>我的</div>
       </div>
     </div>
   </nav>
 
-  <script src="app.js?v=2" defer></script>
+  <script src="app.js?v=3" defer></script>
 </body>
 </html>
