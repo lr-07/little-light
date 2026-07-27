@@ -2,233 +2,154 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#A8CFA8">
-  <meta name="description" content="Little Light - A small light for difficult days">
   <title>Little Light</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <div class="lang-toggle">
-    <select id="langSelect" onchange="setLang(this.value)">
-      <option value="en">🇬🇧 English</option>
-      <option value="fi">🇫🇮 Suomen kieli</option>
-    </select>
+    <button id="langBtn" onclick="toggleLanguage()">FI</button>
   </div>
 
   <div id="app">
-    <section id="welcome" class="screen active">
-      <div class="welcome-scene">
-        <svg class="welcome-svg" viewBox="0 0 400 700" preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <linearGradient id="welcomeSky" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color:#e8f0ea"/>
-              <stop offset="100%" style="stop-color:#faf8f4"/>
-            </linearGradient>
-          </defs>
-          <rect width="400" height="700" fill="url(#welcomeSky)"/>
-          <circle class="welcome-moon" cx="200" cy="140" r="50" fill="#f5f0e0" opacity="0.6"/>
-          <circle cx="190" cy="130" r="40" fill="#faf5e8" opacity="0.4"/>
-          <ellipse class="welcome-cloud wc1" cx="80" cy="250" rx="55" ry="18" fill="#fff" opacity="0.5"/>
-          <ellipse class="welcome-cloud wc2" cx="320" cy="200" rx="65" ry="22" fill="#fff" opacity="0.4"/>
-          <ellipse class="welcome-cloud wc3" cx="200" cy="320" rx="45" ry="15" fill="#fff" opacity="0.35"/>
-          <polygon points="0,550 80,420 150,480 220,380 300,450 400,400 400,550" fill="#c8d8d0" opacity="0.3"/>
-          <polygon points="0,580 100,470 180,520 250,430 320,490 400,450 400,580" fill="#b8c8c0" opacity="0.2"/>
-          <circle class="welcome-star ws1" cx="60" cy="100" r="2" fill="#fff" opacity="0.7"/>
-          <circle class="welcome-star ws2" cx="120" cy="80" r="1.5" fill="#fff" opacity="0.5"/>
-          <circle class="welcome-star ws3" cx="280" cy="110" r="2" fill="#fff" opacity="0.6"/>
-          <circle class="welcome-star ws4" cx="340" cy="90" r="1.5" fill="#fff" opacity="0.5"/>
-          <circle class="welcome-star ws5" cx="100" cy="160" r="1" fill="#fff" opacity="0.4"/>
-          <circle class="welcome-star ws6" cx="300" cy="170" r="1.5" fill="#fff" opacity="0.5"/>
-        </svg>
-      </div>
-      <div class="welcome-content">
-        <h1>Little Light</h1>
-        <p class="welcome-slogan" data-i18n="welcomeSlogan">A small light for difficult days.</p>
-        <p class="welcome-desc" data-i18n="welcomeDesc">No one should face difficult days alone.</p>
-        <div class="welcome-buttons">
-          <button class="btn btn-full" onclick="navigateTo('home')" data-i18n="welcomeStart">Begin Your Journey</button>
-        </div>
-        <p class="welcome-credit" data-i18n="welcomeCredit">With gentle care from Lumi</p>
-      </div>
+    <section id="splash" class="screen active">
+      <div class="cloud">☁️</div>
+      <div class="cloud">☁️</div>
+      <div class="cloud">☁️</div>
+      <div class="stars">✨</div>
+      <div class="stars">⭐</div>
+      <div class="stars">🌟</div>
+      <div class="moon">🌙</div>
+      <h1>Little Light</h1>
+      <p data-i18n="welcomeSlogan">A small light for difficult days.</p>
+      <small data-i18n="welcomeDesc">No one should face difficult days alone.</small>
     </section>
 
     <section id="home" class="screen">
-      <div class="home-illustration">
-        <svg class="home-svg" viewBox="0 0 400 200" preserveAspectRatio="xMidYMid slice">
-          <circle class="home-moon" cx="320" cy="40" r="28" fill="#f5f0e0" opacity="0.5"/>
-          <ellipse class="home-cloud hc1" cx="60" cy="70" rx="38" ry="13" fill="#fff" opacity="0.3"/>
-          <ellipse class="home-cloud hc2" cx="280" cy="110" rx="48" ry="15" fill="#fff" opacity="0.25"/>
-          <ellipse class="home-cloud hc3" cx="150" cy="35" rx="32" ry="11" fill="#fff" opacity="0.2"/>
-          <polygon points="0,180 80,110 160,155 240,95 320,140 400,120 400,200 0,200" fill="#c8d8d0" opacity="0.25"/>
-          <circle class="home-star hs1" cx="40" cy="20" r="1.5" fill="#fff" opacity="0.6"/>
-          <circle class="home-star hs2" cx="100" cy="12" r="1" fill="#fff" opacity="0.4"/>
-          <circle class="home-star hs3" cx="180" cy="28" r="1.5" fill="#fff" opacity="0.5"/>
-          <circle class="home-star hs4" cx="260" cy="20" r="1" fill="#fff" opacity="0.6"/>
-          <circle class="home-star hs5" cx="340" cy="30" r="1.5" fill="#fff" opacity="0.4"/>
-          <circle class="home-star hs6" cx="120" cy="50" r="1" fill="#fff" opacity="0.3"/>
-        </svg>
+      <div class="header">
+        <div class="moon">🌙</div>
+        <h2 id="homeTitle">Good Evening.</h2>
+        <p id="homeSubtitle">How are you feeling today?</p>
       </div>
-      <div class="home-content">
-        <div class="home-moon-icon">🌙</div>
-        <h2 id="homeTitle" class="home-greeting">Good evening.</h2>
-        <p id="homePrompt" class="home-prompt">How are you feeling today?</p>
-
-        <div class="mood-selector">
-          <div class="mood-options">
-            <button onclick="selectMood(this)" class="mood-btn" data-mood="happy" aria-label="Happy">😊</button>
-            <button onclick="selectMood(this)" class="mood-btn" data-mood="calm" aria-label="Calm">🙂</button>
-            <button onclick="selectMood(this)" class="mood-btn" data-mood="sad" aria-label="Sad">😔</button>
-            <button onclick="selectMood(this)" class="mood-btn" data-mood="overwhelmed" aria-label="Overwhelmed">😭</button>
+      <div class="moods">
+        <button onclick="selectMood(this)">😊</button>
+        <button onclick="selectMood(this)">🙂</button>
+        <button onclick="selectMood(this)">😔</button>
+        <button onclick="selectMood(this)">😭</button>
+      </div>
+      <div class="divider"></div>
+      <div class="chat-entry">
+        <p class="subtitle" id="chatSubtitle">Take your time.<br>I'm here to listen.</p>
+        <button class="btn" onclick="navigateTo('chat')">Talk with Lumi</button>
+      </div>
+      <div class="divider"></div>
+      <div class="card journal-card">
+        <div class="card-header">
+          <div class="card-icon">📝</div>
+          <div>
+            <div class="card-title" id="journalTitle">Today's Journal</div>
+            <div class="card-desc" id="journalDesc">What happened today?</div>
           </div>
         </div>
-
-        <div class="divider"></div>
-
-        <div class="comfort-section">
-          <p class="comfort-line" data-i18n="comfortLine1">Take your time.</p>
-          <p class="comfort-line" data-i18n="comfortLine2">I'm here to listen.</p>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="chat-start">
-          <button class="btn btn-primary btn-full" onclick="navigateTo('chat')" data-i18n="talkToLumi">Talk with Lumi</button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="journal-section">
-          <div class="section-label" data-i18n="todaysJournal">Today's Journal</div>
-          <textarea id="journalTextarea" class="journal-textarea" data-i18n-ph="journalPlaceholder" placeholder="Write what's on your mind..." oninput="saveJournal(this)"></textarea>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="journey-section" onclick="navigateTo('journey')">
-          <div class="section-label" data-i18n="littleJourney">Little Journey</div>
-          <div class="journey-inline">
-            <span class="journey-day-label">Day <span id="currentDay">6</span></span>
-            <span class="journey-emoji">🌱</span>
+        <textarea id="journalTextarea" placeholder="Write anything that's on your mind..." oninput="saveJournal(this)"></textarea>
+      </div>
+      <div class="card journey-card" onclick="navigateTo('journey')">
+        <div class="tree">🌱</div>
+        <div class="info">
+          <div class="label" id="journeyLabel">Little Journey</div>
+          <div class="value">Day 6</div>
+          <div class="progress">
+            <div class="progress-bar"></div>
           </div>
         </div>
-
-        <div class="divider"></div>
-
-        <div class="quote-section">
-          <div class="section-label" data-i18n="quoteLabel">Quote</div>
-          <p class="quote-text" id="dailyQuote">"The sky doesn't ask you to be perfect."</p>
-        </div>
+      </div>
+      <div class="card quote-card">
+        <div class="quote-icon">💫</div>
+        <div class="quote-text">"The sky doesn't ask you to be perfect."</div>
+        <div class="quote-author">— Today's gentle reminder</div>
       </div>
     </section>
 
     <section id="chat" class="screen">
       <div class="chat-header">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <div class="chat-avatar">🐱</div>
-        <div class="chat-title">Lumi</div>
+        <div class="avatar">🐱</div>
+        <div class="title">Lumi</div>
       </div>
-      <div id="messages" class="messages-container">
-        <div class="message ai-message">
-          <div class="message-avatar">🐱</div>
-          <div class="message-content" data-i18n="chatWelcome">You look a little tired today. Want to talk?</div>
-        </div>
+      <div id="messages" class="messages">
+        <div class="message ai" id="chatWelcome">Hi, I'm Lumi. How are you feeling today?</div>
       </div>
-      <div class="chat-input-area">
-        <input id="msg" data-i18n-ph="chatPlaceholder" placeholder="Tell me anything..." autocomplete="off" onkeypress="handleKeyPress(event)">
-        <button class="send-btn" onclick="sendMessage()">→</button>
+      <div class="input-area">
+        <input id="msg" placeholder="Tell me anything..." onkeypress="handleKeyPress(event)">
+        <button class="btn" onclick="sendMessage()">Send</button>
       </div>
     </section>
 
     <section id="mood-journal" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 data-i18n="moodTitle">Mood Journal</h2>
+        <h2 id="moodTitle">Mood Journal</h2>
       </div>
-      <div class="journal-step">
-        <div class="step-indicator">1/3</div>
-        <h3 data-i18n="moodStep1">How are you feeling today?</h3>
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3 id="moodStep1">How are you feeling?</h3>
+        <p>Select one that feels right</p>
       </div>
-      <div class="mood-buttons">
-        <button onclick="selectMoodOption(this,'happy')" class="mood-option-btn">
-          <span class="mood-emoji">😊</span>
-          <span class="mood-label" data-i18n="moodHappy">Happy</span>
-        </button>
-        <button onclick="selectMoodOption(this,'calm')" class="mood-option-btn">
-          <span class="mood-emoji">🙂</span>
-          <span class="mood-label" data-i18n="moodCalm">Calm</span>
-        </button>
-        <button onclick="selectMoodOption(this,'sad')" class="mood-option-btn">
-          <span class="mood-emoji">😔</span>
-          <span class="mood-label" data-i18n="moodSad">Sad</span>
-        </button>
-        <button onclick="selectMoodOption(this,'overwhelmed')" class="mood-option-btn">
-          <span class="mood-emoji">😭</span>
-          <span class="mood-label" data-i18n="moodOverwhelmed">Overwhelmed</span>
-        </button>
+      <div class="mood-grid">
+        <button onclick="selectMoodOption(this,'happy')">😊<span>Happy</span></button>
+        <button onclick="selectMoodOption(this,'calm')">🙂<span>Calm</span></button>
+        <button onclick="selectMoodOption(this,'sad')">😔<span>Sad</span></button>
+        <button onclick="selectMoodOption(this,'overwhelmed')">😭<span>Overwhelmed</span></button>
       </div>
-      <div class="journal-step">
-        <div class="step-indicator">2/3</div>
-        <h3 data-i18n="moodStep2">Where is the stress coming from?</h3>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3 id="moodStep2">What's weighing on you?</h3>
+        <p>Choose one or more</p>
       </div>
-      <div class="source-options">
-        <button onclick="toggleSource(this,'work')" class="source-btn" data-i18n="sourceWork">💼 Work</button>
-        <button onclick="toggleSource(this,'money')" class="source-btn" data-i18n="sourceMoney">💰 Money</button>
-        <button onclick="toggleSource(this,'family')" class="source-btn" data-i18n="sourceFamily">👨‍👩‍👧 Family</button>
-        <button onclick="toggleSource(this,'relationship')" class="source-btn" data-i18n="sourceRelationship">💞 Relationship</button>
-        <button onclick="toggleSource(this,'health')" class="source-btn" data-i18n="sourceHealth">❤️ Health</button>
+      <div class="source-grid">
+        <button onclick="toggleSource(this,'work')">💼 Work</button>
+        <button onclick="toggleSource(this,'money')">💰 Money</button>
+        <button onclick="toggleSource(this,'family')">👨‍👩‍👧 Family</button>
+        <button onclick="toggleSource(this,'relationship')">💞 Relationship</button>
+        <button onclick="toggleSource(this,'health')">❤️ Health</button>
+        <button onclick="toggleSource(this,'other')">📌 Other</button>
       </div>
-      <div class="journal-step">
-        <div class="step-indicator">3/3</div>
-        <h3 data-i18n="moodStep3">Is there one small thing to be thankful for today?</h3>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3 id="moodStep3">A little gratitude</h3>
+        <p>Is there one small thing to be thankful for?</p>
       </div>
-      <div class="gratitude-input">
-        <textarea id="gratitude" data-i18n-ph="gratitudePlaceholder" placeholder="Today, I'm thankful for..."></textarea>
-        <button class="btn btn-full" onclick="saveMoodJournal()" data-i18n="saveJournal">Save</button>
+      <div class="gratitude-section">
+        <textarea id="gratitude" placeholder="Today, I'm grateful for..."></textarea>
+        <button class="btn" style="width:100%" onclick="saveMoodJournal()">Save Journal</button>
       </div>
     </section>
 
     <section id="journey" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 data-i18n="journeyTitle">30 Days to Restart</h2>
+        <h2 id="journeyTitle">Little Journey</h2>
       </div>
-      <div class="journey-hero">
-        <div class="journey-tree-container">
-          <div class="journey-tree" id="journeyTree">🌱</div>
-          <div class="tree-leaves" id="treeLeaves"></div>
-        </div>
-        <h3 data-i18n="journeySubtitle">Every day is a new beginning</h3>
-        <p data-i18n="journeyDesc">Complete today's task, let the tree grow</p>
+      <div class="journey-header">
+        <div class="tree-stage" id="journeyTree">🌱</div>
+        <h3 id="journeySubtitle">30 Days of Restart</h3>
+        <p>Every day, take a small step forward</p>
       </div>
-      <div class="journey-progress">
-        <div class="progress-label" data-i18n="overallProgress">Overall Progress</div>
-        <div class="progress-bar-large">
-          <div class="progress-fill" id="journeyBarFill" style="width: 20%"></div>
+      <div class="progress-overall">
+        <div class="label">Progress</div>
+        <div class="bar">
+          <div class="bar-fill" id="journeyBarFill"></div>
         </div>
-        <div class="progress-stats">
+        <div class="stats">
           <span>Day <span id="journeyDayNum">6</span> / 30</span>
-          <span><span id="journeyPercent">20</span>% complete</span>
+          <span><span id="journeyPercent">20</span>% Complete</span>
         </div>
       </div>
-      <div class="tree-growth-stages">
-        <div class="growth-stage" data-stage="1">
-          <span class="stage-emoji">🌱</span>
-          <span class="stage-label" data-i18n="stage1">Day 1-3</span>
-        </div>
-        <div class="growth-stage" data-stage="2">
-          <span class="stage-emoji">🌿</span>
-          <span class="stage-label" data-i18n="stage2">Day 10</span>
-        </div>
-        <div class="growth-stage" data-stage="3">
-          <span class="stage-emoji">🌳</span>
-          <span class="stage-label" data-i18n="stage3">Day 30</span>
-        </div>
-      </div>
-      <h4 class="section-title" data-i18n="yourJourney">Your Journey</h4>
+      <h4 class="section-label">Your Journey</h4>
       <div class="day-cards" id="dayCards">
         <div class="day-card completed">1</div>
         <div class="day-card completed">2</div>
@@ -261,77 +182,74 @@
         <div class="day-card locked">29</div>
         <div class="day-card locked">30</div>
       </div>
-      <div class="task-card">
-        <h4 class="section-title" data-i18n="todaysTask">Today's Task</h4>
-        <p class="task-desc" id="todayTask" data-i18n-ph="todayTaskPlaceholder">Take three deep breaths and name one thing that made you smile today.</p>
-        <button class="btn btn-full" onclick="completeTask()" data-i18n="markComplete">Mark Complete</button>
+      <div class="card" style="margin-top:24px">
+        <h4 class="section-label">Today's Task</h4>
+        <p class="task-desc">Take three deep breaths and name one thing that made you smile today.</p>
+        <button class="btn" style="width:100%" onclick="completeTask()">Mark Complete</button>
       </div>
     </section>
 
     <section id="community" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 data-i18n="communityTitle">Tree Hole</h2>
+        <h2 id="communityTitle">Tree Hole</h2>
       </div>
       <div class="community-header">
-        <div class="community-title" data-i18n="communityHeaderTitle">Anonymous Gentle Corner</div>
-        <div class="community-desc" data-i18n="communityHeaderDesc">You are not alone here</div>
+        <div class="title">Anonymous Sharing</div>
+        <div class="desc">Share your thoughts. You're not alone.</div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐰</div>
           <div>
-            <div class="post-author" data-i18n="anonymousFriend">Anonymous Friend</div>
-            <div class="post-time" data-i18n="postTime2h">2 hours ago</div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">2 hours ago</div>
           </div>
-          <div class="hug-count">🤗 237</div>
         </div>
-        <div class="post-content" data-i18n="post1Content">Got paid today. After rent, I have $427 left in my bank account. So tired.</div>
+        <div class="post-content">I feel so tired lately. Everything feels heavy, and I don't know how to keep going. But I'm trying.</div>
         <div class="ai-reply">
-          <div class="ai-label" data-i18n="lumiReplies">Lumi replies</div>
-          <div data-i18n="post1Reply">You've already worked so hard. You deserve a kind word today.</div>
+          <div class="ai-label">Lumi's Reply</div>
+          <div>I'm so sorry you're carrying this weight. It takes so much courage just to keep trying. Thank you for being here and sharing this with us.</div>
         </div>
-        <div class="post-actions">
-          <button onclick="toggleHug(this)" class="hug-btn" data-i18n="hugText">🤗 Hug Them</button>
-          <button onclick="showEncourage(this)" class="encourage-btn" data-i18n="encourageText">🌼 Leave Encouragement</button>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
         </div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐱</div>
           <div>
-            <div class="post-author" data-i18n="anonymousFriend2">Anonymous Friend</div>
-            <div class="post-time" data-i18n="postTime5h">5 hours ago</div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">5 hours ago</div>
           </div>
-          <div class="hug-count">🤗 189</div>
         </div>
-        <div class="post-content" data-i18n="post2Content">Went for a walk today and saw a beautiful sunset. Sometimes the little things matter most.</div>
+        <div class="post-content">Today was a good day. I went for a walk and saw a beautiful sunset. Sometimes the small moments are the ones that matter most.</div>
         <div class="ai-reply">
-          <div class="ai-label" data-i18n="lumiReplies2">Lumi replies</div>
-          <div data-i18n="post2Reply">Noticing such beautiful moments is a gentle thing in itself. Thank you for sharing this light.</div>
+          <div class="ai-label">Lumi's Reply</div>
+          <div>That sounds so lovely. Celebrating the small moments is such a kind thing to do for yourself. Thank you for sharing this light with us.</div>
         </div>
-        <div class="post-actions">
-          <button onclick="toggleHug(this)" class="hug-btn" data-i18n="hugText2">🤗 Hug Them</button>
-          <button onclick="showEncourage(this)" class="encourage-btn" data-i18n="encourageText2">🌼 Leave Encouragement</button>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
         </div>
       </div>
       <div class="post-card">
         <div class="post-header">
           <div class="post-avatar">🐻</div>
           <div>
-            <div class="post-author" data-i18n="anonymousFriend3">Anonymous Friend</div>
-            <div class="post-time" data-i18n="postTimeYesterday">Yesterday</div>
+            <div class="post-author">Anonymous Friend</div>
+            <div class="post-time">Yesterday</div>
           </div>
-          <div class="hug-count">🤗 312</div>
         </div>
-        <div class="post-content" data-i18n="post3Content">Got rejected from the interview. Applied for months with no response, starting to doubt myself.</div>
+        <div class="post-content">I got rejected for the job I really wanted. I've been applying for months and nothing is working. I'm starting to doubt myself.</div>
         <div class="ai-reply">
-          <div class="ai-label" data-i18n="lumiReplies3">Lumi replies</div>
-          <div data-i18n="post3Reply">Rejection is painful. But today's events don't define who you are. You've been very brave.</div>
+          <div class="ai-label">Lumi's Reply</div>
+          <div>Rejection is so hard, especially when you've put so much into it. Your worth isn't defined by one job or one "no." I believe in you, even when you can't.</div>
         </div>
-        <div class="post-actions">
-          <button onclick="toggleHug(this)" class="hug-btn" data-i18n="hugText3">🤗 Hug Them</button>
-          <button onclick="showEncourage(this)" class="encourage-btn" data-i18n="encourageText3">🌼 Leave Encouragement</button>
+        <div class="actions">
+          <button onclick="toggleHug(this)">🤗 Hug</button>
+          <button onclick="showEncourage(this)">💝 Encourage</button>
         </div>
       </div>
     </section>
@@ -339,44 +257,42 @@
     <section id="profile" class="screen">
       <div class="back-bar">
         <div class="back" onclick="navigateTo('home')">←</div>
-        <h2 data-i18n="profileTitle">My Page</h2>
+        <h2 id="profileTitle">My Profile</h2>
       </div>
       <div class="profile-header">
-        <div class="profile-avatar">🐰</div>
-        <h3 data-i18n="profileName">Dear Friend</h3>
-        <p data-i18n="profileDesc">Your gentle companion is here</p>
+        <div class="avatar">🐰</div>
+        <h3>Dear Friend</h3>
+        <p>Your gentle companion is here</p>
       </div>
-      <div class="stats-row">
-        <div class="stat-item">
-          <div class="stat-value" id="daysTogether">27</div>
-          <div class="stat-label" data-i18n="daysTogetherLabel">Days together ❤️</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="value">12</div>
+          <div class="label">Days Together</div>
         </div>
-        <div class="stat-item">
-          <div class="stat-value">🔥🔥🔥🔥🔥🔥🔥</div>
-          <div class="stat-label" data-i18n="streakLabel">Daily streak: 7 Days</div>
+        <div class="stat-card">
+          <div class="value">7</div>
+          <div class="label">Streak</div>
         </div>
-      </div>
-      <div class="growth-card">
-        <h4 data-i18n="growthChanges">🌱 Growth Changes</h4>
-        <div class="growth-stats">
-          <div class="growth-item">
-            <span class="growth-label" data-i18n="stressLabel">Stress</span>
-            <span class="growth-value down">↓18%</span>
-          </div>
-          <div class="growth-item">
-            <span class="growth-label" data-i18n="sleepLabel">Sleep</span>
-            <span class="growth-value up">↑22%</span>
-          </div>
-          <div class="growth-item">
-            <span class="growth-label" data-i18n="happinessLabel">Happiness</span>
-            <span class="growth-value up">↑31%</span>
-          </div>
+        <div class="stat-card">
+          <div class="value">48</div>
+          <div class="label">Journal Entries</div>
         </div>
       </div>
-      <div class="personal-quote">
-        <div class="quote-icon">✨</div>
-        <div class="quote-text" data-i18n="personalQuote">"Slow down, you're still moving forward."</div>
-        <div class="quote-label" data-i18n="personalQuoteLabel">Your personal quote</div>
+      <div class="card chart-card">
+        <h4>Mood Trends</h4>
+        <div class="chart">
+          <div class="bar" style="height:60%"></div>
+          <div class="bar" style="height:80%"></div>
+          <div class="bar high" style="height:90%"></div>
+          <div class="bar" style="height:40%"></div>
+          <div class="bar" style="height:70%"></div>
+          <div class="bar high" style="height:85%"></div>
+          <div class="bar" style="height:75%"></div>
+        </div>
+      </div>
+      <div class="quote-section">
+        <div class="quote-text">"You are doing better than you think."</div>
+        <div class="quote-date">Your daily quote</div>
       </div>
     </section>
   </div>
@@ -385,27 +301,27 @@
     <div class="nav-items">
       <div class="nav-item active" onclick="navigateTo('home')">
         <div class="icon">🏠</div>
-        <div data-i18n="navHome">Home</div>
+        <div>Home</div>
       </div>
       <div class="nav-item" onclick="navigateTo('chat')">
         <div class="icon">💬</div>
-        <div data-i18n="navChat">Chat</div>
+        <div>Chat</div>
       </div>
       <div class="nav-item" onclick="navigateTo('mood-journal')">
         <div class="icon">📝</div>
-        <div data-i18n="navJournal">Journal</div>
+        <div>Journal</div>
       </div>
       <div class="nav-item" onclick="navigateTo('community')">
         <div class="icon">🌳</div>
-        <div data-i18n="navCommunity">Community</div>
+        <div>Community</div>
       </div>
       <div class="nav-item" onclick="navigateTo('profile')">
         <div class="icon">👤</div>
-        <div data-i18n="navProfile">Profile</div>
+        <div>Profile</div>
       </div>
     </div>
   </nav>
 
-  <script src="app.js" defer></script>
+  <script src="app.js"></script>
 </body>
 </html>
