@@ -1,30 +1,4 @@
-addEventListener('fetch', (event) => {
-  event.respondWith(handleRequest(event.request));
-});
-
-function corsHeaders() {
-  return {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-    'Access-Control-Max-Age': '86400',
-    'Content-Type': 'application/json',
-  };
-}
-
-async function handleRequest(request) {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders() });
-  }
-
-  const url = new URL(request.url);
-  
-  if (url.pathname === '/api/chat') {
-    try {
-      const body = await request.json();
-      const messages = body.messages || [];
-      
-      const systemPrompt = `You are Lumi, a gentle AI companion.
+const SYSTEM_PROMPT = `You are Lumi, a gentle AI companion.
 
 ## Personality Traits
 - Gentle, quiet, patient
@@ -73,46 +47,90 @@ If user mentions self-harm or suicide:
 2. Provide resources
 3. Continue to offer support`;
 
-      const apiKey = request.headers.get('X-API-Key') || '';
-      
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: systemPrompt },
-            ...messages,
-          ],
-          temperature: 0.7,
-          max_tokens: 150,
-        }),
-      });
+const QUOTE_PROMPT = 'You are a source of gentle wisdom. Generate a short, comforting quote for someone going through difficult times. Keep it under 50 characters. Make it feel warm and supportive.';
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        return new Response(JSON.stringify({
-          error: data.error?.message || 'API error',
-        }), {
-          status: response.status,
-          headers: corsHeaders(),
-        });
-      }
+const API_URL = 'https://api.deepseek.com/v1/chat/completions';
 
-      return new Response(JSON.stringify({
-        reply: data.choices?.[0]?.message?.content || '',
-      }), {
+// The API key should be set as a Worker secret named DEEPSEEK_API_KEY
+// For setup: Cloudflare Dashboard -> Workers & Pages -> Worker -> Settings -> Variables
+const API_KEY = (typeof DEEPSEEK_API_KEY !== 'undefined') ? DEEPSEEK_API_KEY : '';
+
+function corsHeaders() {
+  return {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Content-Type': 'application/json',
+  };
+}
+
+async function callDeepSeek(messages, model = 'deepseek-chat', maxTokens = 150, temperature = 0.7) {
+  if (!API_KEY) {
+    throw new Error('API key not configured. Please set DEEPSEEK_API_KEY secret.');
+  }
+
+  const response = await fetch(API_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${API_KEY}`,
+    },
+    body: JSON.stringify({
+      model,
+      messages,
+      temperature,
+      max_tokens: maxTokens,
+    }),
+  });
+
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.error?.message || 'API error');
+  }
+
+  return data.choices?.[0]?.message?.content || '';
+}
+
+async function handleRequest(request) {
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders() });
+  }
+
+  const url = new URL(request.url);
+
+  if (url.pathname === '/health') {
+    const configured = !!API_KEY;
+    return new Response(JSON.stringify({ 
+      status: 'ok', 
+      apiKeyConfigured: configured 
+    }), { headers: corsHeaders() });
+  }
+
+  if (url.pathname === '/api/chat') {
+    try {
+      const body = await request.json();
+      const messages = body.messages || [];
+
+      const aiResponse = await callDeepSeek(
+        [
+          { role: 'system', content: SYSTEM_PROMPT },
+          ...messages,
+        ],
+        'deepseek-chat',
+        150,
+        0.7
+      );
+
+      return new Response(JSON.stringify({ reply: aiResponse }), {
         headers: corsHeaders(),
       });
     } catch (error) {
-      return new Response(JSON.stringify({
-        error: error.message || 'Server error',
+      const isConfigError = error.message?.includes('not configured');
+      return new Response(JSON.stringify({ 
+        error: isConfigError ? 'API key not configured' : error.message,
+        setupNeeded: isConfigError 
       }), {
-        status: 500,
+        status: isConfigError ? 503 : 500,
         headers: corsHeaders(),
       });
     }
@@ -120,43 +138,30 @@ If user mentions self-harm or suicide:
 
   if (url.pathname === '/api/quote') {
     try {
-      const apiKey = request.headers.get('X-API-Key') || '';
-      
-      const response = await fetch('https://api.deepseek.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model: 'deepseek-chat',
-          messages: [
-            { role: 'system', content: 'You are a source of gentle wisdom. Generate a short, comforting quote for someone going through difficult times. Keep it under 50 characters. Make it feel warm and supportive.' },
-            { role: 'user', content: 'Give me a gentle quote for today.' },
-          ],
-          temperature: 0.8,
-          max_tokens: 60,
-        }),
-      });
+      const quote = await callDeepSeek(
+        [
+          { role: 'system', content: QUOTE_PROMPT },
+          { role: 'user', content: 'Give me a gentle quote for today.' },
+        ],
+        'deepseek-chat',
+        60,
+        0.8
+      );
 
-      const data = await response.json();
-      return new Response(JSON.stringify({
-        quote: data.choices?.[0]?.message?.content || '',
-      }), {
+      return new Response(JSON.stringify({ quote }), {
         headers: corsHeaders(),
       });
     } catch (error) {
-      return new Response(JSON.stringify({
-        error: error.message,
-      }), {
+      return new Response(JSON.stringify({ error: error.message }), {
         status: 500,
         headers: corsHeaders(),
       });
     }
   }
 
-  return new Response('Not found', { 
-    status: 404,
-    headers: corsHeaders(),
-  });
+  return new Response('Not found', { status: 404, headers: corsHeaders() });
 }
+
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
+});
