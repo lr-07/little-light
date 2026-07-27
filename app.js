@@ -1131,7 +1131,7 @@ function navigateTo(screenId) {
 }
 
 function updateNavActive(screenId) {
-  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4 };
+  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4, pricing: 5 };
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => item.classList.remove('active'));
   if (navMap[screenId] !== undefined) {
@@ -1599,7 +1599,7 @@ function applyTranslations() {
   });
 
   document.querySelectorAll('.nav-item div:last-child').forEach((el, i) => {
-    const navTexts = [t.navHome, t.navChat, t.navJournal, t.navCommunity, t.navProfile];
+    const navTexts = [t.navHome, t.navChat, t.navJournal, t.navCommunity, t.navProfile, t.navPricing];
     if (navTexts[i]) el.textContent = navTexts[i];
   });
 
@@ -1637,35 +1637,47 @@ function applyTranslations() {
   const stepDesc3 = document.getElementById('stepDesc3');
   if (stepDesc3) stepDesc3.textContent = t.moodStep3Desc;
 
-  const paywallTitle = document.getElementById('paywallTitle');
-  if (paywallTitle) paywallTitle.textContent = t.paywallTitle;
+  const pricingTitle = document.getElementById('pricingTitle');
+  if (pricingTitle) pricingTitle.textContent = t.pricingTitle;
 
-  const paywallDesc = document.getElementById('paywallDesc');
-  if (paywallDesc) paywallDesc.textContent = t.paywallDesc;
+  const pricingSubtitle = document.getElementById('pricingSubtitle');
+  if (pricingSubtitle) pricingSubtitle.textContent = t.pricingSubtitle;
 
-  const paywallPremiumBadge = document.getElementById('paywallPremiumBadge');
-  if (paywallPremiumBadge) paywallPremiumBadge.textContent = t.premiumBadge;
+  const pricingDesc = document.getElementById('pricingDesc');
+  if (pricingDesc) pricingDesc.textContent = t.pricingDesc;
 
-  const paywallPremiumTitle = document.getElementById('paywallPremiumTitle');
-  if (paywallPremiumTitle) paywallPremiumTitle.textContent = t.premiumTitle;
+  const freeBadge = document.getElementById('freeBadge');
+  if (freeBadge) freeBadge.textContent = t.freeBadge;
 
-  const paywallPremiumBtn = document.getElementById('paywallPremiumBtn');
-  if (paywallPremiumBtn) paywallPremiumBtn.textContent = t.premiumBtn;
+  const freeTitle = document.getElementById('freeTitle');
+  if (freeTitle) freeTitle.textContent = t.freeTitle;
 
-  const paywallAnnualBadge = document.getElementById('paywallAnnualBadge');
-  if (paywallAnnualBadge) paywallAnnualBadge.textContent = t.annualBadge;
+  const freeBtn = document.getElementById('freeBtn');
+  if (freeBtn) freeBtn.textContent = t.freeBtn;
 
-  const paywallAnnualTitle = document.getElementById('paywallAnnualTitle');
-  if (paywallAnnualTitle) paywallAnnualTitle.textContent = t.annualTitle;
+  const premiumBadge = document.getElementById('premiumBadge');
+  if (premiumBadge) premiumBadge.textContent = t.premiumBadge;
 
-  const paywallAnnualSave = document.getElementById('paywallAnnualSave');
-  if (paywallAnnualSave) paywallAnnualSave.textContent = t.annualSave;
+  const premiumTitle = document.getElementById('premiumTitle');
+  if (premiumTitle) premiumTitle.textContent = t.premiumTitle;
 
-  const paywallAnnualBtn = document.getElementById('paywallAnnualBtn');
-  if (paywallAnnualBtn) paywallAnnualBtn.textContent = t.annualBtn;
+  const premiumBtn = document.getElementById('premiumBtn');
+  if (premiumBtn) premiumBtn.textContent = t.premiumBtn;
 
-  const paywallCloseBtn = document.getElementById('paywallCloseBtn');
-  if (paywallCloseBtn) paywallCloseBtn.textContent = t.paywallClose;
+  const annualBadge = document.getElementById('annualBadge');
+  if (annualBadge) annualBadge.textContent = t.annualBadge;
+
+  const annualTitle = document.getElementById('annualTitle');
+  if (annualTitle) annualTitle.textContent = t.annualTitle;
+
+  const annualSave = document.getElementById('annualSave');
+  if (annualSave) annualSave.textContent = t.annualSave;
+
+  const annualBtn = document.getElementById('annualBtn');
+  if (annualBtn) annualBtn.textContent = t.annualBtn;
+
+  const pricingTerms = document.getElementById('pricingTerms');
+  if (pricingTerms) pricingTerms.textContent = t.pricingTerms;
 
   updateChatLimitIndicator();
 }
