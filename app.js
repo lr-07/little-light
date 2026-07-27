@@ -9,7 +9,15 @@ const STORAGE_KEYS = {
   chatHistory: 'lumiChatHistory',
   progress: 'journeyProgress',
   streak: 'streakCount',
-  lastVisit: 'lastVisitDate'
+  lastVisit: 'lastVisitDate',
+  subscription: 'lumi_subscription',
+  chatCount: 'lumi_chat_count_'
+};
+
+const CHAT_LIMITS = {
+  free: 5,
+  premium: Infinity,
+  annual: Infinity
 };
 
 const LANGUAGES = {
@@ -72,7 +80,51 @@ const responses = {
     gratitudePlaceholder: "Today, I'm thankful for...",
     moodStep1Desc: 'Pick the one that fits best',
     moodStep2Desc: 'Select all that apply',
-    moodStep3Desc: 'Even just a warm cup of tea'
+    moodStep3Desc: 'Even just a warm cup of tea',
+    pricingTitle: 'Pricing',
+    pricingSubtitle: 'Choose your plan',
+    pricingDesc: 'Every plan includes a gentle AI companion',
+    freeTitle: 'Free',
+    freeBadge: 'Free',
+    freeFeature1: '5 chats per day',
+    freeFeature2: 'Basic mood tracking',
+    freeFeature3: 'Community access',
+    freeFeature4: 'Unlimited chats',
+    freeFeature5: 'Advanced insights',
+    freeFeature6: 'Priority support',
+    freeBtn: 'Get Started',
+    premiumTitle: 'Premium',
+    premiumBadge: 'Popular',
+    premiumFeature1: 'Unlimited chats',
+    premiumFeature2: 'Advanced mood tracking',
+    premiumFeature3: 'Community access',
+    premiumFeature4: 'Weekly insights report',
+    premiumFeature5: 'Custom journal prompts',
+    premiumFeature6: 'Priority support',
+    premiumBtn: 'Subscribe',
+    annualTitle: 'Annual',
+    annualBadge: 'Best Value',
+    annualSave: 'Save 33%',
+    annualFeature1: 'Everything in Premium',
+    annualFeature2: 'Yearly progress report',
+    annualFeature3: 'Exclusive content',
+    annualFeature4: 'Early access to new features',
+    annualFeature5: 'Custom companion themes',
+    annualFeature6: 'Dedicated support',
+    annualBtn: 'Subscribe',
+    pricingTerms: 'By subscribing, you agree to our Terms of Service and Privacy Policy',
+    paywallTitle: 'Daily chat limit reached',
+    paywallDesc: 'You\'ve used all 5 daily chats. Upgrade to Premium for unlimited conversations.',
+    paywallUpgrade: 'Upgrade now',
+    paywallClose: 'Close',
+    checkoutTitle: 'Complete your purchase',
+    checkoutDesc: 'Secure payment powered by Stripe',
+    checkoutNote: 'This is a demo mode - no real payment will be processed',
+    checkoutPay: 'Continue to payment',
+    checkoutCancel: 'Cancel',
+    chatLimitText: 'Daily chats:',
+    chatUnlimited: '✓ Unlimited chats',
+    navPricing: 'Pricing'
   },
   zh: {
     homeTitle: '晚上好 🌙',
@@ -112,7 +164,51 @@ const responses = {
     gratitudePlaceholder: '今天，我感谢...',
     moodStep1Desc: '选一个最贴近的',
     moodStep2Desc: '可以多选',
-    moodStep3Desc: '哪怕只是一杯热茶'
+    moodStep3Desc: '哪怕只是一杯热茶',
+    pricingTitle: '订阅',
+    pricingSubtitle: '选择你的方案',
+    pricingDesc: '每个方案都包含温柔的AI伴侣',
+    freeTitle: '免费版',
+    freeBadge: '免费',
+    freeFeature1: '每天5次聊天',
+    freeFeature2: '基础情绪追踪',
+    freeFeature3: '社区访问',
+    freeFeature4: '无限聊天',
+    freeFeature5: '高级洞察',
+    freeFeature6: '优先支持',
+    freeBtn: '开始使用',
+    premiumTitle: 'Premium',
+    premiumBadge: '热门',
+    premiumFeature1: '无限聊天',
+    premiumFeature2: '高级情绪追踪',
+    premiumFeature3: '社区访问',
+    premiumFeature4: '每周洞察报告',
+    premiumFeature5: '自定义日记提示',
+    premiumFeature6: '优先支持',
+    premiumBtn: '订阅',
+    annualTitle: '年度版',
+    annualBadge: '最优惠',
+    annualSave: '节省33%',
+    annualFeature1: '包含Premium所有功能',
+    annualFeature2: '年度进度报告',
+    annualFeature3: '独家内容',
+    annualFeature4: '新功能抢先体验',
+    annualFeature5: '自定义主题',
+    annualFeature6: '专属支持',
+    annualBtn: '订阅',
+    pricingTerms: '订阅即表示您同意我们的服务条款和隐私政策',
+    paywallTitle: '每日聊天次数已用完',
+    paywallDesc: '您已用完今日5次聊天机会。升级到Premium享受无限对话。',
+    paywallUpgrade: '立即升级',
+    paywallClose: '关闭',
+    checkoutTitle: '完成购买',
+    checkoutDesc: '由Stripe安全支付',
+    checkoutNote: '这是演示模式 - 不会进行真实支付',
+    checkoutPay: '继续支付',
+    checkoutCancel: '取消',
+    chatLimitText: '今日聊天:',
+    chatUnlimited: '✓ 无限聊天',
+    navPricing: '订阅'
   },
   ja: {
     homeTitle: 'こんばんは 🌙',
@@ -152,7 +248,51 @@ const responses = {
     gratitudePlaceholder: '今日、感謝したいことは...',
     moodStep1Desc: '一番近いものを選んでください',
     moodStep2Desc: 'いくつでも選べます',
-    moodStep3Desc: '温かいお茶一杯でもいい'
+    moodStep3Desc: '温かいお茶一杯でもいい',
+    pricingTitle: '料金',
+    pricingSubtitle: 'プランを選択',
+    pricingDesc: 'どのプランにも優しいAIコンパニオンが含まれます',
+    freeTitle: '無料',
+    freeBadge: '無料',
+    freeFeature1: '毎日5回のチャット',
+    freeFeature2: '基本的な気分追跡',
+    freeFeature3: 'コミュニティアクセス',
+    freeFeature4: '無制限チャット',
+    freeFeature5: '高度な洞察',
+    freeFeature6: '優先サポート',
+    freeBtn: '始める',
+    premiumTitle: 'プレミアム',
+    premiumBadge: '人気',
+    premiumFeature1: '無制限チャット',
+    premiumFeature2: '高度な気分追跡',
+    premiumFeature3: 'コミュニティアクセス',
+    premiumFeature4: '毎週の洞察レポート',
+    premiumFeature5: 'カスタムジャーナルプロンプト',
+    premiumFeature6: '優先サポート',
+    premiumBtn: '購入',
+    annualTitle: '年間',
+    annualBadge: '最もお得',
+    annualSave: '33%節約',
+    annualFeature1: 'プレミアム全ての機能',
+    annualFeature2: '年間進捗レポート',
+    annualFeature3: '独占コンテンツ',
+    annualFeature4: '新機能先行アクセス',
+    annualFeature5: 'カスタムコンパニオンテーマ',
+    annualFeature6: '専属サポート',
+    annualBtn: '購入',
+    pricingTerms: '購入することで、利用規約とプライバシーポリシーに同意したものとみなします',
+    paywallTitle: '毎日のチャット上限に達しました',
+    paywallDesc: '今日の5回のチャットを使い切りました。プレミアムにアップグレードして無制限の会話をお楽しみください。',
+    paywallUpgrade: '今すぐアップグレード',
+    paywallClose: '閉じる',
+    checkoutTitle: '購入を完了',
+    checkoutDesc: 'Stripeによる安全な決済',
+    checkoutNote: 'これはデモモードです - 実際の支払いは行われません',
+    checkoutPay: '決済に進む',
+    checkoutCancel: 'キャンセル',
+    chatLimitText: '今日のチャット:',
+    chatUnlimited: '✓ 無制限チャット',
+    navPricing: '料金'
   },
   ko: {
     homeTitle: '저녁이에요 🌙',
@@ -192,7 +332,51 @@ const responses = {
     gratitudePlaceholder: '오늘 고마운 일은...',
     moodStep1Desc: '가장 가까운 것을 선택하세요',
     moodStep2Desc: '여러 개 선택 가능',
-    moodStep3Desc: '따뜻한 차 한 잔이라도 좋아요'
+    moodStep3Desc: '따뜻한 차 한 잔이라도 좋아요',
+    pricingTitle: '가격',
+    pricingSubtitle: '플랜을 선택하세요',
+    pricingDesc: '모든 플랜에 친절한 AI 컴패니언이 포함됩니다',
+    freeTitle: '무료',
+    freeBadge: '무료',
+    freeFeature1: '매일 5회 채팅',
+    freeFeature2: '기본 기분 추적',
+    freeFeature3: '커뮤니티 액세스',
+    freeFeature4: '무제한 채팅',
+    freeFeature5: '고급 인사이트',
+    freeFeature6: '우선 지원',
+    freeBtn: '시작하기',
+    premiumTitle: '프리미엄',
+    premiumBadge: '인기',
+    premiumFeature1: '무제한 채팅',
+    premiumFeature2: '고급 기분 추적',
+    premiumFeature3: '커뮤니티 액세스',
+    premiumFeature4: '주간 인사이트 보고서',
+    premiumFeature5: '커스텀 저널 프롬프트',
+    premiumFeature6: '우선 지원',
+    premiumBtn: '구독',
+    annualTitle: '연간',
+    annualBadge: '최적의 가치',
+    annualSave: '33% 절약',
+    annualFeature1: '프리미엄 모든 기능',
+    annualFeature2: '연간 진행 보고서',
+    annualFeature3: '독점 콘텐츠',
+    annualFeature4: '새 기능 선행 접근',
+    annualFeature5: '커스텀 컴패니언 테마',
+    annualFeature6: '전용 지원',
+    annualBtn: '구독',
+    pricingTerms: '구독하면 서비스 약관과 개인정보 보호 정책에 동의하는 것으로 간주합니다',
+    paywallTitle: '일일 채팅 제한에 도달했습니다',
+    paywallDesc: '오늘 5회 채팅을 모두 사용했습니다. 프리미엄으로 업그레이드하여 무제한 대화를 즐겨보세요.',
+    paywallUpgrade: '지금 업그레이드',
+    paywallClose: '닫기',
+    checkoutTitle: '구매 완료',
+    checkoutDesc: 'Stripe에 의한 안전한 결제',
+    checkoutNote: '이것은 데모 모드입니다 - 실제 결제는 이루어지지 않습니다',
+    checkoutPay: '결제 진행',
+    checkoutCancel: '취소',
+    chatLimitText: '오늘 채팅:',
+    chatUnlimited: '✓ 무제한 채팅',
+    navPricing: '가격'
   },
   es: {
     homeTitle: 'Buenas noches 🌙',
@@ -232,7 +416,51 @@ const responses = {
     gratitudePlaceholder: 'Hoy, estoy agradecido por...',
     moodStep1Desc: 'Elige el que mejor se ajuste',
     moodStep2Desc: 'Selecciona todos los que apliquen',
-    moodStep3Desc: 'Incluso una taza de té caliente'
+    moodStep3Desc: 'Incluso una taza de té caliente',
+    pricingTitle: 'Precios',
+    pricingSubtitle: 'Elige tu plan',
+    pricingDesc: 'Todos los planes incluyen un compañero AI gentil',
+    freeTitle: 'Gratis',
+    freeBadge: 'Gratis',
+    freeFeature1: '5 chats por día',
+    freeFeature2: 'Seguimiento de humor básico',
+    freeFeature3: 'Acceso a comunidad',
+    freeFeature4: 'Chats ilimitados',
+    freeFeature5: 'Perspectivas avanzadas',
+    freeFeature6: 'Soporte prioritario',
+    freeBtn: 'Empezar',
+    premiumTitle: 'Premium',
+    premiumBadge: 'Popular',
+    premiumFeature1: 'Chats ilimitados',
+    premiumFeature2: 'Seguimiento de humor avanzado',
+    premiumFeature3: 'Acceso a comunidad',
+    premiumFeature4: 'Informe semanal de perspectivas',
+    premiumFeature5: 'Prompts personalizados para diario',
+    premiumFeature6: 'Soporte prioritario',
+    premiumBtn: 'Suscribirse',
+    annualTitle: 'Anual',
+    annualBadge: 'Mejor valor',
+    annualSave: 'Ahorra un 33%',
+    annualFeature1: 'Todo en Premium',
+    annualFeature2: 'Informe anual de progreso',
+    annualFeature3: 'Contenido exclusivo',
+    annualFeature4: 'Acceso anticipado a nuevas funciones',
+    annualFeature5: 'Temas personalizados para compañero',
+    annualFeature6: 'Soporte dedicado',
+    annualBtn: 'Suscribirse',
+    pricingTerms: 'Al suscribirse, aceptas nuestros Términos de Servicio y Política de Privacidad',
+    paywallTitle: 'Límite diario de chats alcanzado',
+    paywallDesc: 'Has usado tus 5 chats diarios. Actualiza a Premium para conversaciones ilimitadas.',
+    paywallUpgrade: 'Actualizar ahora',
+    paywallClose: 'Cerrar',
+    checkoutTitle: 'Completa tu compra',
+    checkoutDesc: 'Pago seguro con Stripe',
+    checkoutNote: 'Este es un modo de demostración - no se procesará ningún pago real',
+    checkoutPay: 'Continuar al pago',
+    checkoutCancel: 'Cancelar',
+    chatLimitText: 'Chats diarios:',
+    chatUnlimited: '✓ Chats ilimitados',
+    navPricing: 'Precios'
   },
   fr: {
     homeTitle: 'Bonsoir 🌙',
@@ -272,7 +500,51 @@ const responses = {
     gratitudePlaceholder: "Aujourd'hui, je suis reconnaissant pour...",
     moodStep1Desc: 'Choisis celui qui te ressemble le plus',
     moodStep2Desc: 'Sélectionne tout ce qui s\'applique',
-    moodStep3Desc: 'Même une tasse de thé chaude'
+    moodStep3Desc: 'Même une tasse de thé chaude',
+    pricingTitle: 'Tarifs',
+    pricingSubtitle: 'Choisissez votre plan',
+    pricingDesc: 'Tous les plans incluent un compagnon AI gentil',
+    freeTitle: 'Gratuit',
+    freeBadge: 'Gratuit',
+    freeFeature1: '5 conversations par jour',
+    freeFeature2: 'Suivi d\'humeur de base',
+    freeFeature3: 'Accès à la communauté',
+    freeFeature4: 'Conversations illimitées',
+    freeFeature5: 'Analyses avancées',
+    freeFeature6: 'Support prioritaire',
+    freeBtn: 'Commencer',
+    premiumTitle: 'Premium',
+    premiumBadge: 'Populaire',
+    premiumFeature1: 'Conversations illimitées',
+    premiumFeature2: 'Suivi d\'humeur avancé',
+    premiumFeature3: 'Accès à la communauté',
+    premiumFeature4: 'Rapport hebdomadaire d\'analyses',
+    premiumFeature5: 'Suggestions personnalisées pour le journal',
+    premiumFeature6: 'Support prioritaire',
+    premiumBtn: 'S\'abonner',
+    annualTitle: 'Annuel',
+    annualBadge: 'Meilleure valeur',
+    annualSave: 'Économisez 33%',
+    annualFeature1: 'Tout ce qui est dans Premium',
+    annualFeature2: 'Rapport annuel de progression',
+    annualFeature3: 'Contenu exclusif',
+    annualFeature4: 'Accès anticipé aux nouvelles fonctionnalités',
+    annualFeature5: 'Thèmes personnalisés pour le compagnon',
+    annualFeature6: 'Support dédié',
+    annualBtn: 'S\'abonner',
+    pricingTerms: 'En vous abonnant, vous acceptez nos Conditions d\'utilisation et notre Politique de confidentialité',
+    paywallTitle: 'Limite quotidienne atteinte',
+    paywallDesc: 'Vous avez utilisé vos 5 conversations du jour. Passez à Premium pour des conversations illimitées.',
+    paywallUpgrade: 'Mettre à niveau maintenant',
+    paywallClose: 'Fermer',
+    checkoutTitle: 'Compléter votre achat',
+    checkoutDesc: 'Paiement sécurisé par Stripe',
+    checkoutNote: 'Ceci est un mode démo - aucun paiement réel ne sera effectué',
+    checkoutPay: 'Poursuivre vers le paiement',
+    checkoutCancel: 'Annuler',
+    chatLimitText: 'Conversations du jour:',
+    chatUnlimited: '✓ Conversations illimitées',
+    navPricing: 'Tarifs'
   }
 };
 
@@ -859,7 +1131,7 @@ function navigateTo(screenId) {
 }
 
 function updateNavActive(screenId) {
-  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4 };
+  const navMap = { home: 0, chat: 1, 'mood-journal': 2, community: 3, profile: 4, pricing: 5 };
   const navItems = document.querySelectorAll('.nav-item');
   navItems.forEach(item => item.classList.remove('active'));
   if (navMap[screenId] !== undefined) {
@@ -882,11 +1154,19 @@ function saveJournal(textarea) {
 }
 
 async function sendMessage() {
+  if (!checkChatLimit()) {
+    showPaywall();
+    return;
+  }
+
   const t = responses[currentLang];
   const input = document.getElementById('msg');
   const messagesEl = document.getElementById('messages');
   const value = input.value.trim();
   if (!value) return;
+
+  incrementChatCount();
+  updateChatLimitIndicator();
 
   setLoading(true);
 
@@ -957,6 +1237,112 @@ async function sendMessage() {
   } finally {
     setLoading(false);
   }
+}
+
+function getSubscriptionStatus() {
+  const saved = localStorage.getItem(STORAGE_KEYS.subscription);
+  return saved || 'free';
+}
+
+function getTodayChatCount() {
+  const today = new Date().toISOString().split('T')[0];
+  const key = STORAGE_KEYS.chatCount + today;
+  const count = localStorage.getItem(key);
+  return parseInt(count) || 0;
+}
+
+function incrementChatCount() {
+  const today = new Date().toISOString().split('T')[0];
+  const key = STORAGE_KEYS.chatCount + today;
+  const current = getTodayChatCount();
+  localStorage.setItem(key, (current + 1).toString());
+  return current + 1;
+}
+
+function checkChatLimit() {
+  const plan = getSubscriptionStatus();
+  const limit = CHAT_LIMITS[plan];
+  const count = getTodayChatCount();
+  return count < limit;
+}
+
+function showPaywall() {
+  const t = responses[currentLang];
+  const overlay = document.createElement('div');
+  overlay.className = 'paywall-overlay';
+  overlay.id = 'paywallOverlay';
+  overlay.innerHTML = `
+    <div class="paywall-modal">
+      <div class="paywall-icon">✨</div>
+      <h3>${t.paywallTitle}</h3>
+      <p>${t.paywallDesc}</p>
+      <button class="btn" onclick="navigateTo('pricing'); document.getElementById('paywallOverlay').remove()">${t.paywallUpgrade}</button>
+      <button class="btn btn-outline" onclick="document.getElementById('paywallOverlay').remove()">${t.paywallClose}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function selectPlan(plan) {
+  if (plan === 'free') {
+    localStorage.setItem(STORAGE_KEYS.subscription, 'free');
+    navigateTo('home');
+    return;
+  }
+
+  const stripeKey = 'pk_test_your_stripe_key_here';
+  const prices = {
+    premium: 'price_your_premium_price_id',
+    annual: 'price_your_annual_price_id'
+  };
+
+  const t = responses[currentLang];
+  const overlay = document.createElement('div');
+  overlay.className = 'paywall-overlay';
+  overlay.id = 'stripeOverlay';
+  overlay.innerHTML = `
+    <div class="paywall-modal">
+      <div class="paywall-icon">💳</div>
+      <h3>${t.checkoutTitle}</h3>
+      <p>${t.checkoutDesc}</p>
+      <div style="font-size: 12px; color: var(--text-light); margin-bottom: 20px;">${t.checkoutNote}</div>
+      <button class="btn" onclick="processPayment('${plan}')">${t.checkoutPay}</button>
+      <button class="btn btn-outline" onclick="document.getElementById('stripeOverlay').remove()">${t.checkoutCancel}</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function processPayment(plan) {
+  const t = responses[currentLang];
+  localStorage.setItem(STORAGE_KEYS.subscription, plan);
+  localStorage.setItem(STORAGE_KEYS.subscriptionExpire, Date.now() + 30 * 24 * 60 * 60 * 1000);
+  document.getElementById('stripeOverlay').remove();
+  navigateTo('home');
+}
+
+function updateChatLimitIndicator() {
+  const plan = getSubscriptionStatus();
+  const t = responses[currentLang];
+  const limit = CHAT_LIMITS[plan];
+  const count = getTodayChatCount();
+  
+  let indicator = document.querySelector('.chat-limit-indicator');
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.className = 'chat-limit-indicator';
+    document.getElementById('chat')?.appendChild(indicator);
+  }
+  
+  if (plan === 'free') {
+    indicator.textContent = `${t.chatLimitText} ${count}/${limit}`;
+  } else {
+    indicator.textContent = t.chatUnlimited;
+  }
+}
+
+function initSubscription() {
+  updateChatLimitIndicator();
 }
 
 function setLoading(isLoading) {
@@ -1213,7 +1599,7 @@ function applyTranslations() {
   });
 
   document.querySelectorAll('.nav-item div:last-child').forEach((el, i) => {
-    const navTexts = [t.navHome, t.navChat, t.navJournal, t.navCommunity, t.navProfile];
+    const navTexts = [t.navHome, t.navChat, t.navJournal, t.navCommunity, t.navProfile, t.navPricing];
     if (navTexts[i]) el.textContent = navTexts[i];
   });
 
@@ -1250,6 +1636,50 @@ function applyTranslations() {
 
   const stepDesc3 = document.getElementById('stepDesc3');
   if (stepDesc3) stepDesc3.textContent = t.moodStep3Desc;
+
+  const pricingTitle = document.getElementById('pricingTitle');
+  if (pricingTitle) pricingTitle.textContent = t.pricingTitle;
+
+  const pricingSubtitle = document.getElementById('pricingSubtitle');
+  if (pricingSubtitle) pricingSubtitle.textContent = t.pricingSubtitle;
+
+  const pricingDesc = document.getElementById('pricingDesc');
+  if (pricingDesc) pricingDesc.textContent = t.pricingDesc;
+
+  const freeBadge = document.getElementById('freeBadge');
+  if (freeBadge) freeBadge.textContent = t.freeBadge;
+
+  const freeTitle = document.getElementById('freeTitle');
+  if (freeTitle) freeTitle.textContent = t.freeTitle;
+
+  const freeBtn = document.getElementById('freeBtn');
+  if (freeBtn) freeBtn.textContent = t.freeBtn;
+
+  const premiumBadge = document.getElementById('premiumBadge');
+  if (premiumBadge) premiumBadge.textContent = t.premiumBadge;
+
+  const premiumTitle = document.getElementById('premiumTitle');
+  if (premiumTitle) premiumTitle.textContent = t.premiumTitle;
+
+  const premiumBtn = document.getElementById('premiumBtn');
+  if (premiumBtn) premiumBtn.textContent = t.premiumBtn;
+
+  const annualBadge = document.getElementById('annualBadge');
+  if (annualBadge) annualBadge.textContent = t.annualBadge;
+
+  const annualTitle = document.getElementById('annualTitle');
+  if (annualTitle) annualTitle.textContent = t.annualTitle;
+
+  const annualSave = document.getElementById('annualSave');
+  if (annualSave) annualSave.textContent = t.annualSave;
+
+  const annualBtn = document.getElementById('annualBtn');
+  if (annualBtn) annualBtn.textContent = t.annualBtn;
+
+  const pricingTerms = document.getElementById('pricingTerms');
+  if (pricingTerms) pricingTerms.textContent = t.pricingTerms;
+
+  updateChatLimitIndicator();
 }
 
 function renderJourneyProgress() {
@@ -1402,6 +1832,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initChat();
     initProfileStats();
     fetchDailyQuote();
+    initSubscription();
   }, 3500);
 
   try {
