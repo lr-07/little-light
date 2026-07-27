@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Little Light</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+  <meta name="theme-color" content="#A8CFA8">
+  <meta name="description" content="Little Light - A gentle AI companion for difficult days">
+  <title>Little Light - A small light for difficult days</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -28,14 +30,14 @@
     <section id="home" class="screen">
       <div class="header">
         <div class="moon">🌙</div>
-        <h2 id="homeTitle">Good Evening.</h2>
+        <h2 id="homeTitle">Good evening.</h2>
         <p id="homeSubtitle">How are you feeling today?</p>
       </div>
       <div class="moods">
-        <button onclick="selectMood(this)">😊</button>
-        <button onclick="selectMood(this)">🙂</button>
-        <button onclick="selectMood(this)">😔</button>
-        <button onclick="selectMood(this)">😭</button>
+        <button onclick="selectMood(this)" aria-label="Happy">😊</button>
+        <button onclick="selectMood(this)" aria-label="Calm">🙂</button>
+        <button onclick="selectMood(this)" aria-label="Sad">😔</button>
+        <button onclick="selectMood(this)" aria-label="Overwhelmed">😭</button>
       </div>
       <div class="divider"></div>
       <div class="chat-entry">
@@ -59,7 +61,7 @@
           <div class="label" id="journeyLabel">Little Journey</div>
           <div class="value">Day 6</div>
           <div class="progress">
-            <div class="progress-bar"></div>
+            <div class="progress-bar" style="width: 20%"></div>
           </div>
         </div>
       </div>
@@ -80,7 +82,7 @@
         <div class="message ai">Hi, I'm Lumi. How are you feeling today?</div>
       </div>
       <div class="input-area">
-        <input id="msg" placeholder="Tell me anything..." onkeypress="handleKeyPress(event)">
+        <input id="msg" placeholder="Tell me anything..." autocomplete="off" onkeypress="handleKeyPress(event)">
         <button class="btn" onclick="sendMessage()">Send</button>
       </div>
     </section>
@@ -138,14 +140,14 @@
       <div class="progress-overall">
         <div class="label">Progress</div>
         <div class="bar">
-          <div class="bar-fill"></div>
+          <div class="bar-fill" style="width: 20%"></div>
         </div>
         <div class="stats">
           <span>Day 6 / 30</span>
           <span>20% Complete</span>
         </div>
       </div>
-      <h4 style="font-size:16px;font-weight:600;margin-bottom:12px">Your Journey</h4>
+      <h4 class="section-title">Your Journey</h4>
       <div class="day-cards">
         <div class="day-card completed">1</div>
         <div class="day-card completed">2</div>
@@ -178,9 +180,9 @@
         <div class="day-card locked">29</div>
         <div class="day-card locked">30</div>
       </div>
-      <div class="card" style="margin-top:24px">
-        <h4 style="font-size:16px;font-weight:600;margin-bottom:8px">Today's Task</h4>
-        <p style="font-size:14px;opacity:0.8;margin-bottom:16px">Take three deep breaths and name one thing that made you smile today.</p>
+      <div class="card task-card">
+        <h4 class="section-title">Today's Task</h4>
+        <p class="task-desc">Take three deep breaths and name one thing that made you smile today.</p>
         <button class="btn" style="width:100%" onclick="completeTask()">Mark Complete</button>
       </div>
     </section>
@@ -318,6 +320,6 @@
     </div>
   </nav>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=2" defer></script>
 </body>
 </html>
