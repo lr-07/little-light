@@ -10,7 +10,7 @@
   --border: #EBEBEB;
   --shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
   --shadow-hover: 0 4px 20px rgba(0, 0, 0, 0.08);
-  --font-sans: 'Inter', 'Noto Sans SC', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'HarmonyOS Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Inter', 'Noto Sans SC', 'Noto Sans JP', 'Noto Sans KR', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'HarmonyOS Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1091,9 +1091,9 @@ nav .nav-item .icon { font-size: 20px; }
   z-index: 100;
 }
 
-.lang-toggle button {
-  padding: 8px 16px;
-  border: none;
+.lang-toggle select {
+  padding: 8px 14px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -1103,16 +1103,38 @@ nav .nav-item .icon { font-size: 20px; }
   transition: all 0.2s ease;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   font-family: inherit;
+  color: var(--text);
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%234B4B4B' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
 }
 
-.lang-toggle button:hover { background: var(--secondary); transform: scale(0.98); }
+.lang-toggle select:hover {
+  background: var(--secondary);
+  transform: scale(0.98);
+}
+
+.lang-toggle select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(168, 207, 168, 0.3);
+}
+
+.lang-toggle select option {
+  background: #fff;
+  color: var(--text);
+  font-weight: 500;
+}
 
 @media (max-width: 480px) {
   .screen { padding: 16px 14px; }
   .card { margin-bottom: 12px; }
   #chat .messages { min-height: 320px; max-height: 50vh; }
   .lang-toggle { top: 14px; right: 14px; }
-  .lang-toggle button { padding: 6px 12px; font-size: 11px; }
+  .lang-toggle select { padding: 6px 24px 6px 10px; font-size: 11px; }
   #home .moods button { width: 50px; height: 50px; font-size: 22px; }
   #mood-journal .mood-grid button { font-size: 24px; padding: 16px 8px; }
   #mood-journal .mood-grid button span { font-size: 11px; }
