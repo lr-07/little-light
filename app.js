@@ -107,6 +107,35 @@ function sendMessage() {
   messages.appendChild(typing);
   messages.scrollTop = messages.scrollHeight;
 
+  // ---- 打招呼拦截器：检测简单问候，直接回复，不发后端 ----
+  const casualResponses = [
+    "Hey there! Nice to see you. How's your day going so far?",
+    "Hi! ☺️ I'm really glad you're here. What's on your mind today?",
+    "Hey! Welcome back! How are you doing?",
+    "Hello! Good to see you. What would you like to chat about?",
+    "Hey hey! 👋 How's everything with you?"
+  ];
+  function isCasualGreeting(txt) {
+    var m = txt.trim().toLowerCase();
+    if (/^(hi|hey|hello|yo|sup|hii|heyy|helloo)(!)?$/.test(m) && m.length <= 6) return true;
+    var phrases = ['how are you', "how's it going", "how's your day", 'what\'s up', 'good morning', 'good afternoon', 'good evening'];
+    return phrases.some(function(p) { return m.indexOf(p) !== -1; });
+  }
+  if (isCasualGreeting(value)) {
+    // 打招呼 → 直接本地回复，不调 API
+    setTimeout(function() {
+      messages.removeChild(typing);
+      var aiMsg = document.createElement('div');
+      aiMsg.className = 'message ai';
+      var reply = casualResponses[Math.floor(Math.random() * casualResponses.length)];
+      chatHistory.push({ role: 'assistant', content: reply });
+      messages.appendChild(aiMsg);
+      typeWriter(aiMsg, reply);
+      messages.scrollTop = messages.scrollHeight;
+    }, 400 + Math.random() * 600); // 模拟自然延迟
+    return;
+  }
+
   fetch(`${API_BASE}/api/chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

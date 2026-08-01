@@ -122,6 +122,34 @@ function sendMessage() {
   box.appendChild(typing);
   box.scrollTop = box.scrollHeight;
 
+  // ---- 打招呼拦截器：检测简单问候，直接回复，不发后端 ----
+  var _casualReplies = [
+    "Hey there! Nice to see you. How's your day going so far?",
+    "Hi! ☺️ I'm really glad you're here. What's on your mind today?",
+    "Hey! Welcome back! How are you doing?",
+    "Hello! Good to see you. What would you like to chat about?",
+    "Hey hey! 👋 How's everything with you?"
+  ];
+  function _isCasual(txt) {
+    var m = txt.trim().toLowerCase();
+    if (/^(hi|hey|hello|yo|sup|hii|heyy|helloo)(!)?$/.test(m) && m.length <= 6) return true;
+    return ['how are you', "how's it going", "how's your day", 'what\'s up', 'good morning', 'good afternoon'].some(function(p) { return m.indexOf(p) !== -1; });
+  }
+  if (_isCasual(value)) {
+    setTimeout(function() {
+      box.removeChild(typing);
+      var aiMsg = document.createElement('div');
+      aiMsg.className = 'message ai';
+      var _reply = _casualReplies[Math.floor(Math.random() * _casualReplies.length)];
+      history.push({ role: 'assistant', content: _reply });
+      LS.set('ll_chat_history', history);
+      box.appendChild(aiMsg);
+      typeWriter(aiMsg, _reply);
+      box.scrollTop = box.scrollHeight;
+    }, 400 + Math.random() * 600);
+    return;
+  }
+
   // freemium：本地计数（服务端 KV 也会再卡一道）
   if (!canChatFree()) { box.removeChild(typing); showPaywall(); return; }
 
