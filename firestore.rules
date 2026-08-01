@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 用户文档：users/{uid}
+    //   - 用户只能读写自己的文档
+    //   - 客户端【永远不能】把 isPremium 改为 true（防绕过付费）
+    //   - isPremium 只能由后端代理（firebase-admin）写入
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow write: if request.auth != null
+        && request.auth.uid == uid
+        && (resource == null || resource.data.isPremium == false)
+        && (!('isPremium' in request.resource.data)
+            || request.resource.data.isPremium == false);
+
+      // 对话历史子集合：users/{uid}/conversations/{cid}/messages/{mid}
+      //   客户端可直接读写自己的消息（用于聊天记录持久化与恢复）。
+      //   注意：isPremium 在上面的用户文档级规则保护，不在此子集合，无法被篡改绕过付费。
+      match /conversations/{cid}/messages/{mid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+
+      // 其他未来子集合沿用同主权
+      match /{sub=**} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+    }
+  }
+}

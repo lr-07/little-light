@@ -1,0 +1,30 @@
+# Git 忽略文件 —— 这些不上传到 GitHub
+
+# 大型安装包（本地用就行）
+*.exe
+*.msi
+*.zip
+
+# Flutter / Dart 编译产物
+.dart_tool/
+build/
+*.apk
+*.ipa
+*.app
+
+# Node
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 临时/敏感
+.env
+.env.local
+*.log

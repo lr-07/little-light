@@ -1,0 +1,15 @@
+name = "little-light-api"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+# 非敏感配置可放 [vars]；密钥请用 `wrangler secret put` 设置，不要写在这里。
+[vars]
+# 模型选择提示（worker 实际优先用 OPENAI_API_KEY，其次 DEEPSEEK_API_KEY）
+MODEL_PROVIDER = "openai"   # openai | deepseek
+
+# KV 绑定（社区存储 + 限流 + 每日语录缓存）。
+# 先执行：wrangler kv namespace create little-light-kv
+# 把输出的 id 填到下面；未配置时 worker 自动降级（社区用示例帖、无限流）。
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_WITH_YOUR_KV_ID"

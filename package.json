@@ -1,0 +1,12 @@
+{
+  "name": "little-light",
+  "version": "1.0.0",
+  "description": "A small light for difficult days",
+  "scripts": {
+    "deploy:api": "wrangler deploy",
+    "deploy:pages": "echo 'Deploy to Cloudflare Pages via Dashboard'",
+    "dev": "wrangler dev"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

@@ -1,0 +1,16 @@
+{
+  "name": "littlelight-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LittleLightV1 后端代理：藏 OpenAI Key + 服务端限流 + RevenueCat 订阅校验",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}

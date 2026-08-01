@@ -1,0 +1,14 @@
+{
+  "name": "littlelight-functions",
+  "version": "1.0.0",
+  "private": true,
+  "description": "LittleLightV1 后端 Cloud Functions 入口（复用 ../handler.js）",
+  "main": "index.js",
+  "engines": {
+    "node": "18"
+  },
+  "dependencies": {
+    "firebase-functions": "^5.1.0",
+    "firebase-admin": "^12.7.0"
+  }
+}
