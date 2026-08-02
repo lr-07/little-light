@@ -1,8 +1,6 @@
-export default {
-  async fetch(request, env) {
-    return handleRequest(request, env);
-  }
-};
+addEventListener('fetch', (event) => {
+  event.respondWith(handleRequest(event.request));
+});
 
 function corsHeaders() {
   return {
@@ -36,47 +34,41 @@ If the user clearly expresses self-harm, suicide, or deep hopelessness, gently e
 - UK & Ireland: Samaritans 116 123
 - EU: emergency number 112`;
 
-// 检测用户消息是否是简单的打招呼/闲聊
 function isCasualGreeting(text) {
-  const msg = text.trim().toLowerCase();
-  // 极短消息（1-5个字符）且是常见问候词
-  const casualWords = ['hi', 'hey', 'hello', 'yo', 'sup', 'hii', 'heyy', 'helloo', 'hi!', 'hey!', 'hello!'];
-  if (msg.length <= 5 && casualWords.some(w => msg === w || msg === w + '!')) return true;
-  // 常见短问候句
-  const casualPhrases = [
+  var msg = text.trim().toLowerCase();
+  var casualWords = ['hi', 'hey', 'hello', 'yo', 'sup', 'hii', 'heyy', 'helloo', 'hi!', 'hey!', 'hello!'];
+  if (msg.length <= 5 && casualWords.some(function(w) { return msg === w || msg === w + '!'; })) return true;
+  var casualPhrases = [
     'how are you', "how's it going", "how's your day", "what's up",
     'good morning', 'good afternoon', 'good evening', 'good night',
     'how r u', 'how have you been', 'whats up', 'wassup'
   ];
-  if (casualPhrases.some(p => msg.includes(p) || msg === p)) return true;
-  // 纯表情/简短回应
+  if (casualPhrases.some(function(p) { return msg.indexOf(p) !== -1 || msg === p; })) return true;
   if (/^[😊😄🙂😃👋🙌💪❤️🎉👍✨]+$/.test(msg)) return true;
   return false;
 }
 
 function buildSystemPrompt(lastUserMessage) {
-  let prompt = BASE_SYSTEM_PROMPT;
+  var prompt = BASE_SYSTEM_PROMPT;
 
   if (isCasualGreeting(lastUserMessage)) {
-    prompt += `\n\n## ⚡ IMPORTANT: The user just sent a casual greeting or small talk.
-This is NOT a cry for help. This is NOT emotional distress.
-Just say hello back warmly and naturally, like a friend would.
-Examples: "Hey there! Nice to see you. How's your day going?" or "Hi! ☺️ What's on your mind today?"
-DO NOT say anything like "sounds hard", "carry this alone", "must have hurt", "feel better", "here for you in this".`;
+    prompt += '\n\n## ⚡ IMPORTANT: The user just sent a casual greeting or small talk.\nThis is NOT a cry for help. This is NOT emotional distress.\nJust say hello back warmly and naturally, like a friend would.\nExamples: "Hey there! Nice to see you. How\'s your day going?" or "Hi! ☺️ What\'s on your mind today?"\nDO NOT say anything like "sounds hard", "carry this alone", "must have hurt", "feel better", "here for you in this".';
   }
 
   return prompt;
 }
 
-async function handleRequest(request, env) {
+async function handleRequest(request) {
+  var env = typeof globalThis !== 'undefined' ? globalThis : (typeof self !== 'undefined' ? self : {});
+
   if (request.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders() });
   }
 
-  const url = new URL(request.url);
+  var url = new URL(request.url);
 
   if (url.pathname === '/api/chat') {
-    return handleChat(request, env);
+    return handleChat(request);
   }
 
   return new Response(JSON.stringify({ status: 'ok' }), {
@@ -84,32 +76,31 @@ async function handleRequest(request, env) {
   });
 }
 
-async function handleChat(request, env) {
+async function handleChat(request) {
   try {
-    const apiKey = env.OPENAI_API_KEY;
+    // 在 Cloudflare Worker 中，环境变量通过全局变量访问
+    var apiKey = (typeof OPENAI_API_KEY !== 'undefined') ? OPENAI_API_KEY : '';
     if (!apiKey) {
       return new Response(JSON.stringify({ error: 'OPENAI_API_KEY is not set. Add it in Worker Settings → Variables.' }), { status: 500, headers: corsHeaders() });
     }
 
-    const body = await request.json();
-    const messages = body.messages || [];
+    var body = await request.json();
+    var messages = body.messages || [];
 
-    // 取最后一条用户消息来判断是不是打招呼
-    const lastUserMsg = messages.length > 0
-      ? messages[messages.length - 1].content || ''
+    var lastUserMsg = messages.length > 0
+      ? (messages[messages.length - 1].content || '')
       : '';
 
-    const apiBody = JSON.stringify({
+    var apiBody = JSON.stringify({
       model: 'gpt-4o-mini',
       messages: [
         { role: 'system', content: buildSystemPrompt(lastUserMsg) },
-        ...messages.slice(-10),
-      ],
+      ].concat(messages.slice(-10)),
       temperature: 0.7,
       max_tokens: 150,
     });
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    var response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -118,16 +109,16 @@ async function handleChat(request, env) {
       body: apiBody,
     });
 
-    const data = await response.json();
+    var data = await response.json();
 
     if (!response.ok) {
       return new Response(JSON.stringify({
-        error: data.error?.message || 'API error',
+        error: data.error ? data.error.message : 'API error',
       }), { status: response.status, headers: corsHeaders() });
     }
 
     return new Response(JSON.stringify({
-      reply: data.choices?.[0]?.message?.content || '',
+      reply: (data.choices && data.choices[0] && data.choices[0].message) ? data.choices[0].message.content : '',
     }), { headers: corsHeaders() });
 
   } catch (error) {
