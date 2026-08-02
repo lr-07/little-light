@@ -29,10 +29,22 @@
       <div class="moon">🌙</div>
       <h1>Little Light</h1>
       <p>A small light for difficult days.</p>
-      <small>No one should face difficult days alone.</small>
-    </section>
+    <small>No one should face difficult days alone.</small>
+  </section>
 
-    <section id="home" class="screen">
+  <section id="login" class="screen">
+    <div class="login-box">
+      <div class="moon">🌙</div>
+      <h1>Little Light</h1>
+      <p class="tagline">A small light for difficult days</p>
+      <p class="login-hint">What should Lumi call you?</p>
+      <input id="username" placeholder="Your name" maxlength="20" onkeypress="if(event.key==='Enter')loginUser()">
+      <button class="btn" style="width:100%" onclick="loginUser()">Enter</button>
+      <small>No password needed. Your data stays on this device.</small>
+    </div>
+  </section>
+
+  <section id="home" class="screen">
       <div class="header">
         <div class="moon">🌙</div>
         <h2 id="homeTitle">Good Evening.</h2>
@@ -87,6 +99,12 @@
         <div class="message ai">Hi, I'm Lumi. How are you feeling today?</div>
       </div>
       <div id="freeHint" class="free-hint"></div>
+      <div class="topic-chips">
+        <button onclick="quickTopic('I feel a bit down today')">😔 Feeling down</button>
+        <button onclick="quickTopic('I can&#39;t sleep tonight')">🌙 Can't sleep</button>
+        <button onclick="quickTopic('I feel stressed about work')">💼 Stressed</button>
+        <button onclick="quickTopic('I just want to chat')">💬 Just chat</button>
+      </div>
       <div class="input-area">
         <input id="msg" placeholder="Tell me anything..." onkeypress="handleKeyPress(event)">
         <button class="btn" onclick="sendMessage()">Send</button>
@@ -249,6 +267,7 @@
         <div class="quote-text">"You are doing better than you think."</div>
         <div class="quote-date">Your daily quote</div>
       </div>
+      <button class="btn btn-outline" style="width:100%;margin-top:20px" onclick="logoutUser()">Log out</button>
     </section>
   </div>
 
@@ -259,6 +278,11 @@
       <h3 id="paywallTitle">Little Light is in free mode</h3>
       <p id="paywallBody">You get 5 free conversations per day. Subscribe for unlimited talking.</p>
       <button class="btn" style="width:100%" onclick="subscribeStub()">Subscribe (demo)</button>
+      <div class="paywall-divider"><span>or</span></div>
+      <div class="code-box">
+        <input id="codeInput" placeholder="Have an activation code?">
+        <button class="btn btn-outline" style="width:100%" onclick="redeemCode()">Redeem code</button>
+      </div>
       <button class="paywall-close" onclick="closePaywall()">Maybe later</button>
     </div>
   </div>

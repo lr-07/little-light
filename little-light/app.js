@@ -2,7 +2,7 @@
 // 改进：多轮记忆 + 聊天本地持久化 + 网页版 freemium 付费墙 +
 //       社区拉取/发帖 + 旅程本地进度 + 资料真实统计 + 动态语录。
 
-const screens = ['splash', 'home', 'chat', 'mood-journal', 'journey', 'community', 'profile'];
+const screens = ['splash', 'login', 'home', 'chat', 'mood-journal', 'journey', 'community', 'profile'];
 let currentLang = 'en';
 
 // ---------- 本地存储 ----------
@@ -66,6 +66,56 @@ function updateNavActive(screenId) {
   if (navMap[screenId] !== undefined) navItems[navMap[screenId]].classList.add('active');
 }
 
+// ---------- 用户系统（昵称登录，纯前端 localStorage）----------
+const ACTIVATION_CODE = 'LUMI-FOUNDER'; // 创始人激活码：谁输入都能解锁无限对话
+function getCurrentUser() { return LS.get('ll_user', null); }
+function loginUser() {
+  const input = document.getElementById('username');
+  const name = (input.value || '').trim();
+  if (!name) { input.focus(); return; }
+  LS.set('ll_user', name);
+  navigateTo('home');
+  applyUserName();
+}
+function logoutUser() {
+  LS.set('ll_user', null);
+  navigateTo('login');
+}
+function applyUserName() {
+  const name = getCurrentUser();
+  if (!name) return;
+  const sub = document.getElementById('homeSubtitle');
+  if (sub) sub.textContent = `Good to see you, ${name}. How are you feeling today?`;
+}
+function redeemCode() {
+  const input = document.getElementById('codeInput');
+  const code = (input.value || '').trim().toUpperCase();
+  if (code === ACTIVATION_CODE) {
+    LS.set('ll_premium', true);
+    closePaywall();
+    const box = document.getElementById('messages');
+    if (box) {
+      const note = document.createElement('div');
+      note.className = 'message ai';
+      note.textContent = 'Activation code accepted! 🌟 You now have unlimited access. Talk as much as you like.';
+      box.appendChild(note);
+      box.scrollTop = box.scrollHeight;
+    }
+    const hint = document.getElementById('freeHint');
+    if (hint) hint.textContent = 'Unlimited access ✨';
+  } else {
+    input.value = '';
+    input.placeholder = 'Invalid code, try again';
+    input.classList.add('error');
+  }
+}
+function quickTopic(text) {
+  const input = document.getElementById('msg');
+  if (!input) return;
+  input.value = text;
+  sendMessage();
+}
+
 // ---------- 心情选择（首页）----------
 function selectMood(btn) {
   const moodBtns = btn.parentElement.querySelectorAll('button');
@@ -91,9 +141,10 @@ function loadChat() {
       box.appendChild(el);
     });
   } else {
+    const name = getCurrentUser();
     const el = document.createElement('div');
     el.className = 'message ai';
-    el.textContent = "Hi, I'm Lumi. How are you feeling today?";
+    el.textContent = name ? `Hi ${name}, I'm Lumi. How are you feeling today?` : "Hi, I'm Lumi. How are you feeling today?";
     box.appendChild(el);
   }
 }
@@ -124,11 +175,11 @@ function sendMessage() {
 
   // ---- 打招呼拦截器：检测简单问候，直接回复，不发后端 ----
   var _casualReplies = [
-    "Hey there! Nice to see you. How's your day going so far?",
-    "Hi! ☺️ I'm really glad you're here. What's on your mind today?",
-    "Hey! Welcome back! How are you doing?",
-    "Hello! Good to see you. What would you like to chat about?",
-    "Hey hey! 👋 How's everything with you?"
+    "Nice to see you. How's your day going so far?",
+    "I'm really glad you're here. What's on your mind today?",
+    "Welcome back! How are you doing?",
+    "Good to see you. What would you like to chat about?",
+    "How's everything with you?"
   ];
   function _isCasual(txt) {
     var m = txt.trim().toLowerCase();
@@ -141,6 +192,8 @@ function sendMessage() {
       var aiMsg = document.createElement('div');
       aiMsg.className = 'message ai';
       var _reply = _casualReplies[Math.floor(Math.random() * _casualReplies.length)];
+      var _name = getCurrentUser();
+      if (_name) _reply = "Hi " + _name + ", " + _reply.charAt(0).toLowerCase() + _reply.slice(1);
       history.push({ role: 'assistant', content: _reply });
       LS.set('ll_chat_history', history);
       box.appendChild(aiMsg);
@@ -377,6 +430,10 @@ function showEncourage(btn) {
 
 // ---------- 资料（真实统计）----------
 function loadProfile() {
+  const name = getCurrentUser() || 'Dear Friend';
+  const h3 = document.querySelector('#profile .profile-header h3');
+  if (h3) h3.textContent = name;
+
   const first = LS.get('ll_first_visit', null);
   const today = todayStr();
   let daysTogether = 1;
@@ -482,7 +539,8 @@ function escapeHtml(s) {
 
 // ---------- 初始化 ----------
 document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => navigateTo('home'), 3500);
+  const user = getCurrentUser();
+  setTimeout(() => { if (getCurrentUser()) navigateTo('home'); else navigateTo('login'); }, 3500);
   loadChat();
   loadQuote();
 
@@ -492,5 +550,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // 付费墙剩余提示
   const left = remainingFree();
   const hint = document.getElementById('freeHint');
-  if (hint && !LS.get('ll_premium', false)) hint.textContent = `${left} free chats left today`;
+  if (hint) {
+    if (LS.get('ll_premium', false)) hint.textContent = 'Unlimited access ✨';
+    else hint.textContent = `${left} free chats left today`;
+  }
 });
